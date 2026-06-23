@@ -13,6 +13,8 @@ import {
 import { Cheomseongdae3D } from './Cheomseongdae3D';
 import { DotPadOutputPanel } from '../dotpad/DotPadOutputPanel';
 import { TTSNarrationPanel } from '../narration/TTSNarrationPanel';
+import { CompletionScreen } from '../ui/CompletionScreen';
+import { useSwipe } from '../../hooks/useSwipe';
 import styles from './HeritageSlidePlayer.module.css';
 
 const TACTILE_MAP: Record<string, () => DotMatrix> = {
@@ -29,14 +31,18 @@ interface Props {
   heritage: Heritage;
   mode?: 'standard' | 'museum' | 'school';
   initialLang?: Lang;
+  onComplete?: () => void;
+  onBack?: () => void;
+  onSlideChange?: (index: number) => void;
 }
 
-export function HeritageSlidePlayer({ heritage, initialLang = 'ko' }: Props) {
+export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComplete, onBack, onSlideChange }: Props) {
   const [slideIndex, setSlideIndex] = useState(0);
   const [lang] = useState<Lang>(initialLang);
   const [quizSelected, setQuizSelected] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [direction, setDirection] = useState(1);
+  const [completed, setCompleted] = useState(false);
 
   const slide = heritage.slides[slideIndex];
 
@@ -45,22 +51,35 @@ export function HeritageSlidePlayer({ heritage, initialLang = 'ko' }: Props) {
     : createEmptyMatrix();
 
   const goNext = useCallback(() => {
-    if (slideIndex < heritage.slides.length - 1) {
+    if (slideIndex === heritage.slides.length - 1) {
+      setCompleted(true);
+      onComplete?.();
+    } else {
       setDirection(1);
-      setSlideIndex(i => i + 1);
+      setSlideIndex(i => {
+        const next = i + 1;
+        onSlideChange?.(next);
+        return next;
+      });
       setQuizSelected(null);
       setQuizResult(null);
     }
-  }, [slideIndex, heritage.slides.length]);
+  }, [slideIndex, heritage.slides.length, onComplete, onSlideChange]);
 
   const goPrev = useCallback(() => {
     if (slideIndex > 0) {
       setDirection(-1);
-      setSlideIndex(i => i - 1);
+      setSlideIndex(i => {
+        const prev = i - 1;
+        onSlideChange?.(prev);
+        return prev;
+      });
       setQuizSelected(null);
       setQuizResult(null);
     }
-  }, [slideIndex]);
+  }, [slideIndex, onSlideChange]);
+
+  const swipe = useSwipe(goNext, goPrev);
 
   // Keyboard navigation
   useEffect(() => {
@@ -99,7 +118,7 @@ export function HeritageSlidePlayer({ heritage, initialLang = 'ko' }: Props) {
         ))}
       </div>
 
-      <div className={styles.layout}>
+      <div className={styles.layout} {...swipe}>
         {/* Left: 3D frame + slide info */}
         <div className={styles.left}>
           <AnimatePresence mode="wait" custom={direction}>
@@ -182,7 +201,7 @@ export function HeritageSlidePlayer({ heritage, initialLang = 'ko' }: Props) {
             matrix={matrix}
             brailleText={slide.brailleText}
           />
-          <TTSNarrationPanel text={slide.ttsText} autoPlay={false} />
+          <TTSNarrationPanel text={slide.ttsText} autoPlay={mode === 'museum' || mode === 'school'} />
         </div>
       </div>
 
@@ -203,10 +222,19 @@ export function HeritageSlidePlayer({ heritage, initialLang = 'ko' }: Props) {
         <button
           className={`${styles.navBtn} ${styles.nextBtn}`}
           onClick={goNext}
-          disabled={slideIndex === heritage.slides.length - 1}
           aria-label="Next slide"
         >{lang === 'ko' ? '다음' : 'Next'} →</button>
       </div>
+
+      {completed && (
+        <CompletionScreen
+          heritageTitle={heritage.title.ko}
+          mode={mode ?? 'standard'}
+          totalSlides={heritage.slides.length}
+          onRestart={() => { setSlideIndex(0); setCompleted(false); onSlideChange?.(0); }}
+          onMore={onBack ?? (() => {})}
+        />
+      )}
     </div>
   );
 }

@@ -13,6 +13,7 @@ interface Props {
 }
 
 export function TTSNarrationPanel({ text, autoPlay = false }: Props) {
+  const ttsSupported = 'speechSynthesis' in window;
   const [lang, setLang] = useState<LangChoice>('ko');
   const [playing, setPlaying] = useState(false);
   const [bars] = useState(() => Array.from({ length: 20 }, (_, i) => i));
@@ -65,6 +66,12 @@ export function TTSNarrationPanel({ text, autoPlay = false }: Props) {
       </div>
       <p className={styles.text}>{currentText}</p>
       <div className={styles.controls}>
+        {!ttsSupported && (
+          <p style={{ fontSize: '0.75rem', color: 'var(--stone)', fontStyle: 'italic' }}>
+            이 브라우저는 음성 읽기를 지원하지 않습니다. 텍스트로 해설을 읽어보세요.
+          </p>
+        )}
+        {ttsSupported && (
         <button
           className={`${styles.playBtn} ${playing ? styles.playing : ''}`}
           onClick={handlePlay}
@@ -72,6 +79,7 @@ export function TTSNarrationPanel({ text, autoPlay = false }: Props) {
         >
           {playing ? '⏸' : '▶'}
         </button>
+        )}
         <div className={styles.waveform} aria-hidden="true">
           {bars.map(i => (
             <div

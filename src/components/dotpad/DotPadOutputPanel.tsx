@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { DotMatrix } from '../../types/heritage';
 import { DotPadGrid } from './DotPadGrid';
+import { DotPadStatus } from '../ui/DotPadStatus';
 import styles from './DotPadOutputPanel.module.css';
 
 interface Props {
@@ -27,6 +28,7 @@ export function DotPadOutputPanel({ matrix, brailleText }: Props) {
       <div className={styles.header}>
         <span className={styles.dot}>⬡</span>
         <span className={styles.headerText}>DOT PAD OUTPUT PREVIEW</span>
+        <DotPadStatus />
       </div>
       <DotPadGrid matrix={matrix} animating={animating} />
       {brailleText && brailleText.length > 0 && (

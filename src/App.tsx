@@ -15,9 +15,13 @@ const pageTransition = {
 };
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('home');
-  const [selectedId, setSelectedId] = useState<string>('cheomseongdae');
-  const [mode, setMode] = useState<AppMode>('standard');
+  const params = new URLSearchParams(window.location.search);
+  const urlHeritage = params.get('heritage');
+  const urlMode = (params.get('mode') as AppMode) ?? 'museum';
+
+  const [screen, setScreen] = useState<Screen>(urlHeritage ? 'guide' : 'home');
+  const [selectedId, setSelectedId] = useState<string>(urlHeritage ?? 'cheomseongdae');
+  const [mode, setMode] = useState<AppMode>(urlHeritage ? urlMode : 'standard');
 
   const goHome = useCallback(() => setScreen('home'), []);
   const goCollection = useCallback(() => setScreen('collection'), []);

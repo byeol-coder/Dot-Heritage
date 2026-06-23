@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Logo } from '../components/brand/Logo';
 import { DotPadOutputPanel } from '../components/dotpad/DotPadOutputPanel';
 import { TTSNarrationPanel } from '../components/narration/TTSNarrationPanel';
+import { HighContrastToggle } from '../components/ui/HighContrastToggle';
 import { createCheomseongdaeSilhouette } from '../engine/tactile/createCheomseongdae';
 import { Cheomseongdae3D } from '../components/heritage/Cheomseongdae3D';
 import styles from './Home.module.css';
@@ -35,6 +36,7 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
             <a key={l} href="#" className={styles.navLink}>{l}</a>
           ))}
           <span className={styles.langChip}>EN ▾</span>
+          <HighContrastToggle />
         </nav>
       </header>
 

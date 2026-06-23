@@ -1,0 +1,11 @@
+.btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(200,165,106,0.3);
+  color: var(--stone);
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition-fast);
+}
+.btn:hover { border-color: var(--aged-gold); color: var(--aged-gold); }
+.btn.on { background: var(--aged-gold); color: var(--deep-navy); border-color: var(--aged-gold); }

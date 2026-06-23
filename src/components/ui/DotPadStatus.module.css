@@ -1,0 +1,29 @@
+.wrap { position: relative; }
+.chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgba(200,165,106,0.2);
+  border-radius: 20px;
+  font-size: 0.62rem; letter-spacing: 0.1em;
+  color: var(--stone);
+  transition: var(--transition-fast);
+}
+.chip:hover { border-color: rgba(200,165,106,0.4); color: var(--stone-light); }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(200,165,106,0.4);
+}
+.tooltip {
+  position: absolute; bottom: calc(100% + 8px); right: 0;
+  width: 280px;
+  background: var(--ink-navy);
+  border: 1px solid rgba(200,165,106,0.25);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 200;
+  box-shadow: var(--shadow-card);
+}
+.tooltip strong { font-size: 0.8rem; color: var(--aged-gold); }
+.tooltip p { font-size: 0.75rem; color: var(--stone-light); line-height: 1.6; }
+.tooltip a { font-size: 0.72rem; color: var(--jade); }

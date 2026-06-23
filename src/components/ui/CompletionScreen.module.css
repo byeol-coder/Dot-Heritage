@@ -1,0 +1,49 @@
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(7,21,34,0.92);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500;
+  backdrop-filter: blur(8px);
+}
+.card {
+  background: var(--ink-navy);
+  border: 1px solid rgba(200,165,106,0.3);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  display: flex; flex-direction: column; gap: 20px; align-items: center;
+  box-shadow: 0 0 60px rgba(200,165,106,0.12);
+}
+.icon { font-size: 2.5rem; color: var(--aged-gold); }
+.title {
+  font-family: var(--font-serif);
+  font-size: 1.8rem; font-weight: 300;
+  color: var(--ivory);
+}
+.sub { font-size: 0.9rem; color: var(--stone-light); line-height: 1.6; }
+.checklist {
+  display: flex; flex-direction: column; gap: 8px; align-self: stretch;
+  padding: 16px; background: rgba(200,165,106,0.06);
+  border-radius: 12px; border: 1px solid rgba(200,165,106,0.15);
+}
+.checkItem {
+  font-size: 0.82rem; color: var(--jade);
+  text-align: left; padding: 4px 0;
+}
+.actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.btnPrimary {
+  width: 100%; padding: 13px;
+  background: var(--aged-gold); color: var(--deep-navy);
+  border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+  transition: var(--transition-fast);
+}
+.btnPrimary:hover { background: var(--soft-gold); }
+.btnSecondary {
+  width: 100%; padding: 11px;
+  border: 1px solid rgba(200,165,106,0.3);
+  border-radius: 10px; color: var(--stone-light); font-size: 0.85rem;
+  transition: var(--transition-fast);
+}
+.btnSecondary:hover { border-color: var(--aged-gold); color: var(--ivory); }
