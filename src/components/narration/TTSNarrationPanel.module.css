@@ -1,0 +1,78 @@
+.panel {
+  background: rgba(7,21,34,0.9);
+  border: 1px solid rgba(200,165,106,0.2);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon { color: var(--jade); font-size: 0.9rem; }
+.title {
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--aged-gold);
+  flex: 1;
+}
+.langToggle { display: flex; gap: 4px; }
+.langBtn {
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(200,165,106,0.3);
+  color: var(--stone);
+  transition: var(--transition-fast);
+}
+.langBtn.active {
+  background: rgba(200,165,106,0.15);
+  color: var(--aged-gold);
+  border-color: var(--aged-gold);
+}
+.text {
+  font-size: 0.85rem;
+  color: var(--ivory);
+  line-height: 1.6;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.playBtn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--aged-gold);
+  color: var(--deep-navy);
+  font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+.playBtn:hover { background: var(--soft-gold); }
+.playBtn.playing { background: var(--jade); }
+.waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  flex: 1;
+}
+.bar {
+  width: 2px;
+  height: 4px;
+  background: rgba(200,165,106,0.4);
+  border-radius: 1px;
+  transition: height 0.1s;
+}
+.bar.animated {
+  animation: wave 0.8s ease-in-out infinite alternate;
+}
+@keyframes wave {
+  from { height: 4px; background: rgba(200,165,106,0.4); }
+  to   { height: 20px; background: #C8A56A; }
+}

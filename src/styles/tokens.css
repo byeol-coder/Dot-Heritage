@@ -1,0 +1,28 @@
+:root {
+  --deep-navy: #0D1B2A;
+  --ink-navy: #071522;
+  --ivory: #F4F1E8;
+  --ivory-dim: #DDD9CE;
+  --aged-gold: #C8A56A;
+  --soft-gold: #E6C987;
+  --jade: #6FAF9F;
+  --jade-dim: #4E8F80;
+  --stone: #8B8178;
+  --stone-light: #B8B0A6;
+
+  --font-serif: 'Noto Serif KR', 'Georgia', serif;
+  --font-sans: 'Noto Sans KR', 'Pretendard', system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --transition-fast: 200ms ease;
+  --transition-base: 400ms ease;
+  --transition-slow: 700ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --shadow-gold: 0 0 20px rgba(200,165,106,0.25);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+}

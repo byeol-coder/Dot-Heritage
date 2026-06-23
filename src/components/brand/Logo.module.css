@@ -1,0 +1,27 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.name {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--ivory);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.tagline {
+  font-size: 0.55em;
+  letter-spacing: 0.18em;
+  color: var(--aged-gold);
+  font-weight: 300;
+}
+.sm .name { font-size: 1rem; }
+.sm svg { }
+.md .name { font-size: 1.25rem; }
+.lg .name { font-size: 1.75rem; }

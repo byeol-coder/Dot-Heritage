@@ -1,0 +1,37 @@
+.panel {
+  background: rgba(7,21,34,0.9);
+  border: 1px solid rgba(200,165,106,0.25);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dot { color: var(--aged-gold); font-size: 0.75rem; }
+.headerText {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--aged-gold);
+  font-weight: 400;
+}
+.braille {
+  border-top: 1px solid rgba(200,165,106,0.15);
+  padding-top: 10px;
+}
+.brailleLabel {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--stone);
+  margin-bottom: 6px;
+}
+.brailleLine {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ivory-dim);
+  padding: 2px 0;
+}
