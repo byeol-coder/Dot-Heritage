@@ -61,6 +61,11 @@ export const dict: Record<string, { ko: string; en: string }> = {
     en: 'Keys · 1 Front 2 Side 3 Detail · [ ] cycle points · \\ clear · R re-read · S resend · , . switch item',
   },
 
+  'tts.unsupported': {
+    ko: '이 브라우저는 음성 읽기를 지원하지 않습니다. 텍스트로 해설을 읽어보세요.',
+    en: 'This browser does not support speech. Please read the narration text.',
+  },
+
   // ── Screen reader announce ──
   'screen.home': { ko: '홈 화면', en: 'Home' },
   'screen.collection': { ko: '컬렉션 화면', en: 'Collection' },

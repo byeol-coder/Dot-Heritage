@@ -94,12 +94,9 @@ function slideLayerToType(tactileLayer: string, slideIndex: number): TactileLaye
   }
 }
 
-type Lang = 'ko' | 'en';
-
 interface Props {
   heritage: Heritage;
   mode?: 'standard' | 'museum' | 'school';
-  initialLang?: Lang;
   onComplete?: () => void;
   onBack?: () => void;
   onSlideChange?: (index: number) => void;

@@ -5,9 +5,9 @@ import { HighContrastToggle } from '../components/ui/HighContrastToggle';
 import { DotPadOutputPanel } from '../components/dotpad/DotPadOutputPanel';
 import {
   createCheomseongdaeSilhouette,
-  createCheomseongdaeWindow,
-  createCheomseongdaeBase,
 } from '../engine/tactile/createCheomseongdae';
+import { createMoonJarSilhouette } from '../engine/tactile/createMoonJar';
+import { createRoofTileSilhouette } from '../engine/tactile/createRoofTile';
 import { createKoreanPalaceSilhouette } from '../engine/tactile/createKoreanPalace';
 import type { DotMatrix } from '../types/heritage';
 import { MuseumsSection } from '../components/home/MuseumsSection';
@@ -51,7 +51,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     period: { ko: '조선 · 17–18세기', en: 'Joseon · 17th–18th c.' },
     emoji: '🏺',
     image: `${ASSET}assets/heritage/moon-jar.jpg`,
-    matrix: createCheomseongdaeWindow(),
+    matrix: createMoonJarSilhouette(),
     braille: ['백자 달항아리', '조선 백색 원형'],
   },
   {
@@ -60,7 +60,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     period: { ko: '신라 · 7–8세기', en: 'Silla · 7th–8th c.' },
     emoji: '🪷',
     image: `${ASSET}assets/heritage/roof-tile.jpg`,
-    matrix: createCheomseongdaeBase(),
+    matrix: createRoofTileSilhouette(),
     braille: ['신라 수막새', '연꽃 문양 기와'],
   },
   {
