@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { DotMatrix } from '../../types/heritage';
 import { DotPadGrid } from './DotPadGrid';
 import { DotPadStatus } from '../ui/DotPadStatus';
+import { useDotPad } from '../../engine/dotpad/useDotPad';
 import styles from './DotPadOutputPanel.module.css';
 
 export type TactileLayerType = 'silhouette' | 'structure' | 'detail' | 'focus';
@@ -35,6 +36,12 @@ export function DotPadOutputPanel({
   slideLabel,
 }: Props) {
   const [animating, setAnimating] = useState(false);
+  const { isConnected, sendMatrix } = useDotPad();
+
+  // Auto-push the current frame to a connected device whenever it changes.
+  useEffect(() => {
+    if (isConnected) sendMatrix(matrix);
+  }, [isConnected, matrix, sendMatrix]);
 
   const handleLayerChange = (layer: TactileLayerType) => {
     setAnimating(true);
@@ -97,6 +104,16 @@ export function DotPadOutputPanel({
         <span className={styles.specDot}>·</span>
         <span className={styles.spec}>2,400 cells</span>
         {scanning && <span className={styles.specScanning} aria-live="polite">SCANNING...</span>}
+        {isConnected && (
+          <button
+            type="button"
+            className={styles.sendBtn}
+            onClick={() => sendMatrix(matrix)}
+            aria-label="현재 촉각그래픽을 Dot Pad로 다시 전송"
+          >
+            ▶ 전송
+          </button>
+        )}
       </div>
 
       {/* Braille section */}

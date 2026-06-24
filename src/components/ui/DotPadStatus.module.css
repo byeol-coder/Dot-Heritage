@@ -42,6 +42,21 @@
   background: rgba(139,129,120,0.06);
 }
 
+.connecting {
+  color: var(--aged-gold);
+  border-color: rgba(200,165,106,0.4);
+  background: rgba(200,165,106,0.1);
+}
+
+.connecting .dot {
+  animation: blink 0.8s ease-in-out infinite;
+}
+
+.chip:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
 .dot {
   width: 5px;
   height: 5px;
@@ -90,6 +105,13 @@
 .tooltipDesc {
   font-size: var(--text-xs);
   color: var(--ivory-muted);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.tooltipError {
+  font-size: var(--text-xs);
+  color: var(--incorrect, #d98b8b);
   line-height: var(--leading-relaxed);
   margin-bottom: var(--space-3);
 }
