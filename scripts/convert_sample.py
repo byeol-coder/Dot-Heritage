@@ -118,21 +118,21 @@ def get_group_number(filename: str) -> Optional[int]:
     return int(m.group(2)) if m else None
 
 
-def collect_files_by_layer(
+def collect_files_by_label_layer(
     input_dir: str,
     site_filter: Optional[str],
     group: Optional[int] = None,
     primary_only: bool = False,
-) -> Dict[str, List[str]]:
+) -> Dict[str, Dict[str, List[str]]]:
     """
-    Scan input_dir and group CSV paths by their tactile layer.
+    Scan input_dir and group CSV paths by layer → label → [files].
 
-    If `group` is set (1-based), only include files whose trailing number
-    matches — e.g. group=1 picks *_001.csv from each label type.
-    This collects one scan unit per label that likely belongs to the same
-    physical structure, enabling local-coordinate normalisation.
+    Returns:  { 'silhouette': {'VE': [paths...]},
+                'structure':  {'PA': [paths...], 'PI': [...], 'ST': [...]}, ... }
+
+    If `group` is set, only include files with that trailing number.
     """
-    layer_files: Dict[str, List[str]] = defaultdict(list)
+    result: Dict[str, Dict[str, List[str]]] = {l: {} for l in LAYER_ORDER}
     for fname in sorted(os.listdir(input_dir)):
         if not fname.lower().endswith('.csv'):
             continue
@@ -149,8 +149,22 @@ def collect_files_by_layer(
             layer = LABEL_TO_LAYER[label]
             if primary_only and label != PRIMARY_LABEL.get(layer):
                 continue
-            layer_files[layer].append(os.path.join(input_dir, fname))
-    return layer_files
+            result[layer].setdefault(label, []).append(os.path.join(input_dir, fname))
+    return result
+
+
+def collect_files_by_layer(
+    input_dir: str,
+    site_filter: Optional[str],
+    group: Optional[int] = None,
+    primary_only: bool = False,
+) -> Dict[str, List[str]]:
+    """Flat version kept for compatibility — delegates to label-aware version."""
+    nested = collect_files_by_label_layer(input_dir, site_filter, group, primary_only)
+    flat: Dict[str, List[str]] = {}
+    for layer, label_files in nested.items():
+        flat[layer] = [f for files in label_files.values() for f in files]
+    return flat
 
 
 # ─── Projection ───────────────────────────────────────────────────────────────
@@ -345,40 +359,42 @@ def main() -> None:
 
     # ── 1. Discover files ──────────────────────────────────────────────────────
     print(f"\n[1/4] Scanning {input_dir}")
-    layer_files = collect_files_by_layer(
+    layer_label_files = collect_files_by_label_layer(
         input_dir, site_filter=args.site, group=args.group, primary_only=args.primary_only
     )
-    total_files = sum(len(v) for v in layer_files.values())
+    total_files = sum(len(f) for ld in layer_label_files.values() for f in ld.values())
     if total_files == 0:
         print("ERROR: No matching CSV files found. Check --input and --site.")
         sys.exit(1)
     for layer in LAYER_ORDER:
-        files = layer_files.get(layer, [])
-        labels = [get_label_code(Path(f).name) for f in files]
-        print(f"  {layer:12s}: {len(files)} file(s)  {labels}")
+        ld = layer_label_files.get(layer, {})
+        summary = ', '.join(f"{lb}×{len(fs)}" for lb, fs in sorted(ld.items()))
+        print(f"  {layer:12s}: {sum(len(f) for f in ld.values())} file(s)  [{summary}]")
 
-    # ── 2. Load points ─────────────────────────────────────────────────────────
+    # ── 2. Load & project per label (then merge) ───────────────────────────────
     print(f"\n[2/4] Loading points  (sample every {args.sample})")
     all_points: List[Tuple[float, float, float]] = []
-    layer_points: Dict[str, List[Tuple[float, float, float]]] = {}
 
+    # First pass: collect all points for global bounds
+    label_point_cache: Dict[str, List[Tuple[float, float, float]]] = {}
     for layer in LAYER_ORDER:
-        pts: List[Tuple[float, float, float]] = []
-        for fpath in layer_files.get(layer, []):
-            loaded = load_csv_sampled(fpath, sample_every=args.sample)
-            pts.extend(loaded)
-            print(f"    {Path(fpath).name:40s}  {len(loaded):>7,} pts")
-        layer_points[layer] = pts
-        all_points.extend(pts)
+        for label, files in sorted(layer_label_files.get(layer, {}).items()):
+            pts: List[Tuple[float, float, float]] = []
+            for fpath in files:
+                loaded = load_csv_sampled(fpath, sample_every=args.sample)
+                pts.extend(loaded)
+                print(f"    {Path(fpath).name:40s}  {len(loaded):>7,} pts")
+            label_point_cache[label] = pts
+            all_points.extend(pts)
 
     if not all_points:
         print("ERROR: No points loaded.")
         sys.exit(1)
     print(f"  → Total sampled: {len(all_points):,} points")
 
-    # ── 3. Project ─────────────────────────────────────────────────────────────
+    # ── 3. Project & merge grids ───────────────────────────────────────────────
     print(f"\n[3/4] Projecting  view={args.view}  grid={GRID_W}×{GRID_H}  "
-          f"norm={'per-layer' if args.local_norm else 'global'}")
+          f"norm={'per-label' if args.local_norm else 'global'}")
     global_bounds = compute_bounds(all_points)
     xmin, xmax, ymin, ymax, zmin, zmax = global_bounds
     print(f"  Global bounds  X: {xmin:.2f}–{xmax:.2f}  "
@@ -387,18 +403,45 @@ def main() -> None:
 
     layer_grids: Dict[str, List[List[int]]] = {}
     for layer in LAYER_ORDER:
-        pts = layer_points.get(layer, [])
-        if pts:
-            bounds = compute_bounds(pts) if args.local_norm else global_bounds
-            raw = project(pts, bounds, view=args.view)
+        ld = layer_label_files.get(layer, {})
+        if not ld:
+            layer_grids[layer] = [[0] * GRID_W for _ in range(GRID_H)]
+            print(f"  {layer:12s}: (no data — empty grid)")
+            continue
+
+        if args.local_norm:
+            # Per-label: normalize each label independently then merge via max
+            merged = [[0] * GRID_W for _ in range(GRID_H)]
+            for label in sorted(ld.keys()):
+                pts = label_point_cache.get(label, [])
+                if not pts:
+                    continue
+                bounds = compute_bounds(pts)
+                raw = project(pts, bounds, view=args.view)
+                grid = normalize(raw)
+                # Merge: take max per cell so each label contributes its pattern
+                for r in range(GRID_H):
+                    for c in range(GRID_W):
+                        if grid[r][c] > merged[r][c]:
+                            merged[r][c] = grid[r][c]
+                sub_occ = sum(1 for row in grid for v in row if v > 0)
+                print(f"    {label:4s}→{layer:12s}: {sub_occ:4d} cells  "
+                      f"({sub_occ / (GRID_W * GRID_H) * 100:.1f}%)")
+            occupied = sum(1 for row in merged for v in row if v > 0)
+            pct = occupied / (GRID_W * GRID_H) * 100
+            print(f"  {layer:12s}: {occupied:4d} / {GRID_W * GRID_H} merged  ({pct:.1f}%)")
+            layer_grids[layer] = merged
+        else:
+            # Global norm: combine all labels for this layer into one projection
+            pts_all: List[Tuple[float, float, float]] = []
+            for label in sorted(ld.keys()):
+                pts_all.extend(label_point_cache.get(label, []))
+            raw = project(pts_all, global_bounds, view=args.view)
             grid = normalize(raw)
             occupied = sum(1 for row in grid for c in row if c > 0)
             pct = occupied / (GRID_W * GRID_H) * 100
             print(f"  {layer:12s}: {occupied:4d} / {GRID_W * GRID_H} cells occupied  ({pct:.1f}%)")
-        else:
-            grid = [[0] * GRID_W for _ in range(GRID_H)]
-            print(f"  {layer:12s}: (no data — empty grid)")
-        layer_grids[layer] = grid
+            layer_grids[layer] = grid
 
     # ── 4. Write TypeScript ────────────────────────────────────────────────────
     print(f"\n[4/4] Writing output")
