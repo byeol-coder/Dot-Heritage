@@ -26,7 +26,20 @@ OUT_DIR = os.path.join(ROOT, "public", "assets", "audio")
 LANGS = {"ko": "ko", "en": "en"}
 
 
-def synthesize(api, text, lang, refs):
+# Target tone: a bright, friendly museum docent who explains clearly
+# (명랑하지만 설명을 잘하는 도슨트). With GPT-SoVITS the tone comes mostly from the
+# reference clip — pick a warm, upbeat, articulate voice sample. These params
+# nudge delivery to be lively yet clear (a touch brisk, natural variation).
+TONE = {
+    "speed_factor": 1.06,   # slightly brisk = energetic, not rushed
+    "temperature": 1.0,     # natural expressive variation
+    "top_k": 15,
+    "top_p": 1.0,
+    "text_split_method": "cut5",  # split on punctuation for clean phrasing
+}
+
+
+def synthesize(api, text, lang, refs, tone):
     """Call GPT-SoVITS /tts. Adjust params to your server's API."""
     ref = refs[lang]
     payload = {
@@ -36,6 +49,7 @@ def synthesize(api, text, lang, refs):
         "prompt_text": ref["text"],
         "prompt_lang": lang,
         "media_type": "mp3",
+        **tone,
     }
     url = api.rstrip("/") + "/tts?" + urllib.parse.urlencode(payload)
     with urllib.request.urlopen(url, timeout=120) as r:
@@ -48,8 +62,12 @@ def main():
     ap.add_argument("--ref-ko", required=True); ap.add_argument("--ref-ko-text", required=True)
     ap.add_argument("--ref-en", required=True); ap.add_argument("--ref-en-text", required=True)
     ap.add_argument("--only", help="comma-separated keys to (re)generate; default all")
+    ap.add_argument("--speed", type=float, default=TONE["speed_factor"],
+                    help="delivery speed (1.0 neutral; ~1.06 = lively docent)")
+    ap.add_argument("--temperature", type=float, default=TONE["temperature"])
     args = ap.parse_args()
 
+    tone = {**TONE, "speed_factor": args.speed, "temperature": args.temperature}
     refs = {
         "ko": {"audio": args.ref_ko, "text": args.ref_ko_text},
         "en": {"audio": args.ref_en, "text": args.ref_en_text},
@@ -69,7 +87,7 @@ def main():
             text = it[lang]
             out = os.path.join(OUT_DIR, lang, f"{key}.mp3")
             try:
-                audio = synthesize(args.api, text, lang, refs)
+                audio = synthesize(args.api, text, lang, refs, tone)
                 open(out, "wb").write(audio)
                 done += 1
                 print(f"  ✓ {lang}/{key}.mp3  ({len(audio)//1024} KB)")

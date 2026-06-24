@@ -9,6 +9,22 @@ and otherwise falls back to the browser voice — no code changes needed.
 
 Total: **34 keys × 2 languages = 68 files**.
 
+## Voice & tone
+
+Target: **a bright, friendly museum docent who explains clearly**
+(명랑하지만 설명을 잘하는 도슨트). Warm and upbeat so it's welcoming to blind /
+low-vision, children, and older visitors — but articulate and well-paced so the
+information lands.
+
+With GPT-SoVITS the tone comes mostly from the **reference clip**, so choose a
+voice sample that is already cheerful, clear, and unhurried (a docent / friendly
+narrator read works well — avoid flat news-reading or overly dramatic clips).
+Use a clean 5–10s reference per language with the matching `--ref-*-text`.
+
+Recommended generation settings (defaults in `scripts/generate_narration.py`):
+`speed_factor ≈ 1.06` (lively, not rushed), `temperature 1.0`, `top_k 15`,
+`top_p 1.0`, split on punctuation. Tune with `--speed` / `--temperature`.
+
 
 | key | file (ko / en) | 한국어 | English |
 |---|---|---|---|
