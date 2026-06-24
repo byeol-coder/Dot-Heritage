@@ -1,4 +1,6 @@
 .page { min-height: 100dvh; display: flex; flex-direction: column; }
+
+/* ─── Header ─────────────────────────────────────────────────────────── */
 .header {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   padding: 14px 48px;
@@ -7,64 +9,151 @@
   backdrop-filter: blur(12px);
   position: sticky; top: 0; z-index: 100;
 }
+
+/* Museum mode header: slightly more transparent + gold tint bottom border */
+.headerMuseum {
+  background: rgba(10,22,35,0.97);
+  border-bottom-color: rgba(200,165,106,0.22);
+}
+
 .backBtn { font-size: 0.8rem; color: var(--stone-light); transition: color 0.2s; }
 .backBtn:hover { color: var(--ivory); }
 .headerInfo { display: flex; flex-direction: column; flex: 1; }
 .heritageName { font-family: var(--font-serif); font-size: 1rem; color: var(--ivory); }
 .heritageEn { font-size: 0.75rem; color: var(--stone); margin-left: 6px; }
 .heritagePeriod { font-size: 0.7rem; color: var(--stone); }
-.modeBadge { font-size: 0.7rem; padding: 4px 10px; border: 1px solid rgba(200,165,106,0.3); border-radius: 3px; color: var(--aged-gold); }
+
+.modeBadge {
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border: 1px solid rgba(200,165,106,0.3);
+  border-radius: 3px;
+  color: var(--aged-gold);
+}
+.modeBadgeMuseum {
+  border-color: rgba(200,165,106,0.4);
+  background: rgba(200,165,106,0.06);
+  color: var(--aged-gold);
+  letter-spacing: 0.05em;
+}
+.modeBadgeSchool {
+  border-color: rgba(111,175,159,0.35);
+  background: rgba(111,175,159,0.07);
+  color: var(--jade, #6FAF9F);
+  letter-spacing: 0.03em;
+}
+
 .keys { font-size: 0.65rem; color: var(--stone); letter-spacing: 0.05em; }
-.schoolBanner { background: rgba(111,175,159,0.1); border-bottom: 1px solid rgba(111,175,159,0.2); padding: 10px 48px; font-size: 0.82rem; color: var(--jade); }
-.museumBanner { background: rgba(200,165,106,0.07); border-bottom: 1px solid rgba(200,165,106,0.15); padding: 10px 48px; font-size: 0.82rem; color: var(--aged-gold); }
+
+/* ─── Museum Banner ──────────────────────────────────────────────────── */
+.museumBanner {
+  background: rgba(200,165,106,0.06);
+  border-bottom: 1px solid rgba(200,165,106,0.15);
+  padding: var(--space-3, 12px) var(--space-6, 48px);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--aged-gold);
+  letter-spacing: var(--tracking-wide, 0.06em);
+  text-align: center;
+}
+
+/* ─── School Banner ──────────────────────────────────────────────────── */
+.schoolBanner {
+  background: rgba(111,175,159,0.06);
+  border-bottom: 1px solid rgba(111,175,159,0.15);
+  padding: var(--space-3, 12px) var(--space-6, 48px);
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--jade, #6FAF9F);
+  letter-spacing: var(--tracking-normal, 0.02em);
+}
+
+/* ─── School Progress Steps ──────────────────────────────────────────── */
+.schoolProgress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: var(--space-4, 16px) var(--space-6, 48px);
+  border-bottom: 1px solid rgba(111,175,159,0.1);
+  background: rgba(111,175,159,0.03);
+  overflow-x: auto;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  flex: 1;
+  min-width: 80px;
+  position: relative;
+}
+
+/* Connector line between steps */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: calc(50% + 14px);
+  width: calc(100% - 28px);
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  transition: background 0.3s;
+}
+
+/* Completed connector turns jade */
+.stepDone:not(:last-child)::after {
+  background: rgba(111,175,159,0.4);
+}
+
+.stepNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs, 0.7rem);
+  color: var(--stone);
+  font-weight: var(--weight-semibold, 600);
+  transition: all var(--transition-base, 0.25s ease);
+  position: relative;
+  z-index: 1;
+}
+
+.stepDone .stepNum {
+  border-color: var(--jade, #6FAF9F);
+  background: rgba(111,175,159,0.15);
+  color: var(--jade-bright, #7fcfba);
+}
+
+.stepLabel {
+  font-size: var(--text-2xs, 0.62rem);
+  color: var(--stone);
+  text-align: center;
+  letter-spacing: var(--tracking-wide, 0.06em);
+  white-space: nowrap;
+  transition: color var(--transition-base, 0.25s ease);
+}
+
+.stepDone .stepLabel {
+  color: var(--jade, #6FAF9F);
+}
+
+/* ─── Main & key help ────────────────────────────────────────────────── */
 .main { flex: 1; padding: 32px 24px; overflow-y: auto; }
 .keyHelp {
   display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
   padding: 10px 24px;
   border-top: 1px solid rgba(200,165,106,0.08);
-  font-size: 0.65rem; color: var(--stone); letter-spacing: 0.08em;
-}
-.schoolProgress {
-  display: flex; align-items: center; justify-content: center; gap: 0;
-  padding: 12px 48px;
-  background: rgba(111,175,159,0.05);
-  border-bottom: 1px solid rgba(111,175,159,0.1);
-  overflow-x: auto;
-}
-.step {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  flex: 1; min-width: 72px;
-  position: relative;
-}
-.step:not(:last-child)::after {
-  content: '';
-  position: absolute; top: 14px; left: calc(50% + 14px);
-  width: calc(100% - 28px); height: 1px;
-  background: rgba(111,175,159,0.2);
-}
-.stepDone .step::after,
-.step.stepDone::after { background: var(--jade); }
-.stepNum {
-  width: 28px; height: 28px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.7rem; font-weight: 600;
-  border: 1px solid rgba(111,175,159,0.3);
+  font-size: 0.65rem;
   color: var(--stone);
-  background: transparent;
-  transition: all 0.3s;
+  letter-spacing: 0.08em;
+  background: rgba(13,27,42,0.6);
 }
-.stepDone .stepNum {
-  background: var(--jade);
-  color: var(--deep-navy);
-  border-color: var(--jade);
-}
-.stepLabel {
-  font-size: 0.62rem; color: var(--stone);
-  letter-spacing: 0.02em; text-align: center;
-  transition: color 0.3s;
-}
-.stepDone .stepLabel { color: var(--jade); }
 
+/* ─── Responsive ─────────────────────────────────────────────────────── */
 @media (max-width: 700px) {
   .header { padding: 12px 16px; }
   .schoolBanner, .museumBanner { padding: 10px 16px; }

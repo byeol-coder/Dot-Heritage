@@ -1,29 +1,37 @@
 .wrapper {
   position: relative;
-  background: #071828;
-  border: 1px solid rgba(200,165,106,0.3);
+  display: inline-block;
   border-radius: var(--radius-md);
-  padding: 8px;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  overflow: hidden;
+  background: var(--dot-bg, #050F1A);
+  line-height: 0;
 }
+
 .canvas {
   display: block;
-  border-radius: 4px;
-  image-rendering: pixelated;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
 }
-.label {
-  font-size: 0.6rem;
-  letter-spacing: 0.15em;
-  color: var(--stone);
-  text-align: center;
+
+.scanLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--jade) 40%, var(--jade) 60%, transparent 100%);
+  opacity: 0.7;
+  pointer-events: none;
+  box-shadow: 0 0 8px var(--jade-glow);
+  transition: top 14ms linear;
 }
+
 .animating .canvas {
-  animation: pulse-glow 1.2s ease-in-out infinite alternate;
+  animation: dot-pulse 1.2s var(--ease-in-out);
 }
-@keyframes pulse-glow {
-  from { box-shadow: 0 0 0 rgba(200,165,106,0); }
-  to   { box-shadow: 0 0 12px rgba(200,165,106,0.4); }
+
+@keyframes dot-pulse {
+  0%   { filter: brightness(0.7) saturate(1.5); }
+  30%  { filter: brightness(1.2) saturate(1.8); }
+  100% { filter: brightness(1) saturate(1); }
 }

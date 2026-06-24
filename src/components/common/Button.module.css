@@ -1,0 +1,169 @@
+/* DOT HERITAGE — Button Component */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--aged-gold);
+  outline-offset: 3px;
+}
+
+/* === SIZES === */
+.size-sm {
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-4);
+  height: 32px;
+}
+.size-md {
+  font-size: var(--text-base);
+  padding: var(--space-3) var(--space-6);
+  height: 42px;
+}
+.size-lg {
+  font-size: var(--text-md);
+  padding: var(--space-4) var(--space-8);
+  height: 52px;
+}
+
+/* === VARIANTS === */
+
+/* Primary: Museum Gold CTA */
+.variant-primary {
+  background: linear-gradient(135deg, var(--aged-gold) 0%, var(--deep-gold) 100%);
+  color: var(--void-black);
+  box-shadow: 0 2px 12px rgba(200,165,106,0.25);
+}
+.variant-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--soft-gold) 0%, var(--aged-gold) 100%);
+  box-shadow: var(--shadow-gold);
+  transform: translateY(-1px);
+}
+.variant-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 6px rgba(200,165,106,0.2);
+}
+
+/* Secondary: Bordered gold */
+.variant-secondary {
+  background: transparent;
+  color: var(--aged-gold);
+  border: 1px solid rgba(200,165,106,0.45);
+}
+.variant-secondary:hover:not(:disabled) {
+  background: rgba(200,165,106,0.1);
+  border-color: var(--aged-gold);
+  box-shadow: 0 0 16px rgba(200,165,106,0.15);
+}
+
+/* Ghost: Subtle surface */
+.variant-ghost {
+  background: rgba(255,255,255,0.05);
+  color: var(--ivory-dim);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.variant-ghost:hover:not(:disabled) {
+  background: rgba(255,255,255,0.09);
+  color: var(--ivory);
+  border-color: rgba(255,255,255,0.14);
+}
+
+/* Tactile: Jade Dot Pad button */
+.variant-tactile {
+  background: rgba(111,175,159,0.12);
+  color: var(--jade-bright);
+  border: 1px solid rgba(111,175,159,0.35);
+}
+.variant-tactile:hover:not(:disabled) {
+  background: rgba(111,175,159,0.2);
+  box-shadow: var(--shadow-jade);
+  transform: translateY(-1px);
+}
+
+/* Audio: TTS play button */
+.variant-audio {
+  background: rgba(200,165,106,0.08);
+  color: var(--aged-gold);
+  border: 1px solid rgba(200,165,106,0.25);
+}
+.variant-audio:hover:not(:disabled) {
+  background: rgba(200,165,106,0.16);
+  border-color: rgba(200,165,106,0.5);
+}
+.variant-audio[aria-pressed="true"] {
+  background: rgba(200,165,106,0.2);
+  border-color: var(--aged-gold);
+  box-shadow: 0 0 12px rgba(200,165,106,0.2);
+}
+
+/* Danger */
+.variant-danger {
+  background: rgba(200,90,74,0.12);
+  color: #E07A6A;
+  border: 1px solid rgba(200,90,74,0.3);
+}
+.variant-danger:hover:not(:disabled) {
+  background: rgba(200,90,74,0.22);
+}
+
+/* === LAYOUT === */
+.fullWidth {
+  width: 100%;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+}
+
+/* === LOADING === */
+.loading .label,
+.loading .icon {
+  opacity: 0;
+}
+
+.spinner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

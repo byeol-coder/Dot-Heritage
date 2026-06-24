@@ -7,6 +7,39 @@
   margin: 0 auto;
   padding: 0 16px;
 }
+
+/* ─── Progress rail (WOW #1 visual) ─────────────────────────────────── */
+.progressRail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) 0;
+}
+
+.progressDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: all var(--transition-base, 0.25s ease);
+}
+
+.progressDotActive {
+  width: 20px;
+  border-radius: var(--radius-full, 9999px);
+  background: var(--aged-gold, #C8A56A);
+  border-color: var(--aged-gold, #C8A56A);
+  box-shadow: 0 0 8px rgba(200,165,106,0.4);
+}
+
+.progressDotDone {
+  background: rgba(200,165,106,0.5);
+  border-color: rgba(200,165,106,0.4);
+}
+
+/* Keep the old .progress/.dot/.active/.done in case other code uses them */
 .progress {
   display: flex;
   gap: 8px;
@@ -22,6 +55,7 @@
 .dot.active { background: var(--aged-gold); transform: scale(1.3); }
 .dot.done { background: rgba(200,165,106,0.5); }
 
+/* ─── Layout ─────────────────────────────────────────────────────────── */
 .layout {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -35,6 +69,7 @@
 .left { display: flex; flex-direction: column; gap: 16px; }
 .right { display: flex; flex-direction: column; gap: 16px; }
 
+/* ─── Frame & slide info ─────────────────────────────────────────────── */
 .frameWrap { display: flex; flex-direction: column; gap: 12px; position: relative; }
 .slideLabel {
   display: flex;
@@ -79,7 +114,35 @@
   margin-top: 4px;
 }
 
-/* Quiz */
+/* ─── Dot Pad wrapper — scanning & focus glows ───────────────────────── */
+.dotpadWrapper {
+  border-radius: var(--radius-lg, 12px);
+  transition: box-shadow var(--transition-base, 0.25s ease);
+}
+
+/* WOW #1 — Tactile Sync Reveal: jade pulse while scanning */
+.dotpadWrapperScanning {
+  box-shadow:
+    0 0 24px rgba(111,175,159,0.3),
+    0 0 8px rgba(111,175,159,0.15);
+}
+
+/* WOW #2 — Focus Point Bridge: stronger jade glow on focus trigger */
+.dotpadWrapperFocus {
+  box-shadow:
+    0 0 32px rgba(111,175,159,0.45),
+    0 0 12px rgba(111,175,159,0.25),
+    0 0 0 1px rgba(111,175,159,0.3);
+  animation: focusPulse 1.5s ease-out forwards;
+}
+
+@keyframes focusPulse {
+  0%   { box-shadow: 0 0 0 rgba(111,175,159,0.6), 0 0 0 1px rgba(111,175,159,0.5); }
+  40%  { box-shadow: 0 0 36px rgba(111,175,159,0.5), 0 0 12px rgba(111,175,159,0.3), 0 0 0 1px rgba(111,175,159,0.4); }
+  100% { box-shadow: 0 0 0 rgba(111,175,159,0), 0 0 0 1px transparent; }
+}
+
+/* ─── Quiz ───────────────────────────────────────────────────────────── */
 .quiz { display: flex; flex-direction: column; gap: 10px; }
 .quizQ { font-size: 0.9rem; color: var(--ivory-dim); }
 .quizOptions { display: flex; gap: 8px; }
@@ -104,11 +167,13 @@
 .feedback.correct { background: rgba(111,175,159,0.15); color: var(--jade); }
 .feedback.wrong { background: rgba(180,60,60,0.1); color: #e88; }
 
-/* Controls */
+/* ─── Controls ───────────────────────────────────────────────────────── */
 .controls {
   display: flex;
   gap: 12px;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
   padding: 8px 0 16px;
 }
 .navBtn {
@@ -137,3 +202,29 @@
   font-weight: 500;
 }
 .nextBtn:hover:not(:disabled) { background: var(--soft-gold); }
+
+/* WOW #2 — Tactile Focus button (jade styling) */
+.tactileBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--weight-semibold, 600);
+  letter-spacing: var(--tracking-label, 0.08em);
+  text-transform: uppercase;
+  padding: var(--space-2, 8px) var(--space-4, 16px);
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid rgba(111,175,159,0.4);
+  background: rgba(111,175,159,0.08);
+  color: var(--jade-bright, #7fcfba);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+.tactileBtn:hover {
+  background: rgba(111,175,159,0.16);
+  border-color: var(--jade, #6FAF9F);
+  box-shadow: 0 0 12px rgba(111,175,159,0.2);
+}
+.tactileBtn:active {
+  transform: scale(0.97);
+}

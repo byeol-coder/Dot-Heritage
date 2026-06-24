@@ -1,30 +1,51 @@
 import { useState } from 'react';
 import styles from './DotPadStatus.module.css';
 
+type ConnectionState = 'connected' | 'demo' | 'disconnected';
+
 export function DotPadStatus() {
-  const [showInfo, setShowInfo] = useState(false);
+  const [state] = useState<ConnectionState>('demo');
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const labels: Record<ConnectionState, string> = {
+    connected: 'CONNECTED',
+    demo: 'DEMO',
+    disconnected: 'OFFLINE',
+  };
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrapper}>
       <button
-        className={styles.chip}
-        onClick={() => setShowInfo(v => !v)}
-        aria-label="Dot Pad connection status"
-        aria-expanded={showInfo}
+        className={`${styles.chip} ${styles[state]}`}
+        onClick={() => setShowTooltip(v => !v)}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        onBlur={() => setShowTooltip(false)}
+        aria-expanded={showTooltip}
+        aria-label={`Dot Pad 연결 상태: ${labels[state]}`}
+        type="button"
       >
-        <span className={styles.dot} />
-        MOCK · 미연결
+        <span className={styles.dot} aria-hidden="true" />
+        <span>{labels[state]}</span>
       </button>
-      {showInfo && (
+
+      {showTooltip && (
         <div className={styles.tooltip} role="tooltip">
-          <strong>Dot Pad란?</strong>
-          <p>
-            Dot Pad는 60×40 점 행렬로 촉각 그래픽을 표현하는 점자 디스플레이입니다.
-            현재 화면은 미리보기 모드입니다. 실제 기기를 연결하면 각 슬라이드의
-            핵심 형태가 닷패드 위에 자동으로 출력됩니다.
+          <strong className={styles.tooltipTitle}>Dot Pad 60</strong>
+          <p className={styles.tooltipDesc}>
+            {state === 'demo'
+              ? '현재 시뮬레이션 모드입니다. 실제 Dot Pad 기기를 연결하면 촉각그래픽이 물리적으로 출력됩니다.'
+              : state === 'connected'
+              ? 'Dot Pad가 연결되어 있습니다. 촉각그래픽이 실시간으로 출력됩니다.'
+              : 'Dot Pad가 연결되어 있지 않습니다.'}
           </p>
-          <a href="https://dotincorp.com" target="_blank" rel="noopener noreferrer">
-            Dot Inc. 제품 보기 →
+          <a
+            href="https://www.dotincorp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.tooltipLink}
+          >
+            Dot Inc. 알아보기 →
           </a>
         </div>
       )}

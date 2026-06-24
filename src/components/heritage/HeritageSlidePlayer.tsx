@@ -12,6 +12,7 @@ import {
 } from '../../engine/tactile/createCheomseongdae';
 import { Cheomseongdae3D } from './Cheomseongdae3D';
 import { DotPadOutputPanel } from '../dotpad/DotPadOutputPanel';
+import type { TactileLayerType } from '../dotpad/DotPadOutputPanel';
 import { TTSNarrationPanel } from '../narration/TTSNarrationPanel';
 import { CompletionScreen } from '../ui/CompletionScreen';
 import { useSwipe } from '../../hooks/useSwipe';
@@ -24,6 +25,27 @@ const TACTILE_MAP: Record<string, () => DotMatrix> = {
   'cheomseongdae-top': createCheomseongdaeTop,
   'cheomseongdae-quiz': createCheomseongdaeQuiz,
 };
+
+/** Map a slide's TactileLayer to a TactileLayerType for the DotPad panel */
+function slideLayerToType(tactileLayer: string, slideIndex: number): TactileLayerType {
+  // Per-index default override first
+  const indexDefaults: Record<number, TactileLayerType> = {
+    0: 'silhouette',
+    1: 'detail',
+    2: 'structure',
+    3: 'focus',
+  };
+  if (slideIndex in indexDefaults) return indexDefaults[slideIndex];
+
+  // Fallback: map from slide's tactileLayer field
+  switch (tactileLayer) {
+    case 'overview': return 'silhouette';
+    case 'part':     return 'structure';
+    case 'focus':    return 'focus';
+    case 'quiz':     return 'detail';
+    default:         return 'silhouette';
+  }
+}
 
 type Lang = 'ko' | 'en';
 
@@ -44,11 +66,40 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
   const [direction, setDirection] = useState(1);
   const [completed, setCompleted] = useState(false);
 
+  // WOW #1 — Tactile Sync Reveal
+  const [tactileScanning, setTactileScanning] = useState(false);
+
+  // WOW #3 — Layer Morphing
+  const [currentLayer, setCurrentLayer] = useState<TactileLayerType>('silhouette');
+
+  // WOW #2 — Focus Point Bridge
+  const [focusHighlight, setFocusHighlight] = useState(false);
+
   const slide = heritage.slides[slideIndex];
 
-  const matrix: DotMatrix = slide
+  const currentMatrix: DotMatrix = slide
     ? (TACTILE_MAP[slide.tactileGraphicId]?.() ?? createEmptyMatrix())
     : createEmptyMatrix();
+
+  /** Trigger the row-by-row dot reveal on DotPadOutputPanel for 900 ms */
+  const triggerTactileScan = useCallback(() => {
+    setTactileScanning(true);
+    setTimeout(() => setTactileScanning(false), 900);
+  }, []);
+
+  /** Trigger the jade-glow focus highlight for 1500 ms */
+  const triggerFocusHighlight = useCallback(() => {
+    setFocusHighlight(true);
+    setTimeout(() => setFocusHighlight(false), 1500);
+  }, []);
+
+  /** Sync layer state whenever the slide index changes */
+  const syncLayer = useCallback((index: number) => {
+    const targetSlide = heritage.slides[index];
+    if (targetSlide) {
+      setCurrentLayer(slideLayerToType(targetSlide.tactileLayer, index));
+    }
+  }, [heritage.slides]);
 
   const goNext = useCallback(() => {
     if (slideIndex === heritage.slides.length - 1) {
@@ -59,12 +110,14 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
       setSlideIndex(i => {
         const next = i + 1;
         onSlideChange?.(next);
+        syncLayer(next);
         return next;
       });
       setQuizSelected(null);
       setQuizResult(null);
+      triggerTactileScan();
     }
-  }, [slideIndex, heritage.slides.length, onComplete, onSlideChange]);
+  }, [slideIndex, heritage.slides.length, onComplete, onSlideChange, syncLayer, triggerTactileScan]);
 
   const goPrev = useCallback(() => {
     if (slideIndex > 0) {
@@ -72,12 +125,14 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
       setSlideIndex(i => {
         const prev = i - 1;
         onSlideChange?.(prev);
+        syncLayer(prev);
         return prev;
       });
       setQuizSelected(null);
       setQuizResult(null);
+      triggerTactileScan();
     }
-  }, [slideIndex, onSlideChange]);
+  }, [slideIndex, onSlideChange, syncLayer, triggerTactileScan]);
 
   const swipe = useSwipe(goNext, goPrev);
 
@@ -90,6 +145,11 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [goNext, goPrev]);
+
+  // Sync layer on initial mount
+  useEffect(() => {
+    syncLayer(0);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!slide) return null;
 
@@ -107,14 +167,23 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
     exit: (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
   };
 
+  const slideLabel = `${slideIndex + 1} / ${heritage.slides.length}`;
+
   return (
     <div className={styles.player}>
-      {/* Progress bar */}
-      <div className={styles.progress} role="progressbar"
-        aria-valuenow={slideIndex + 1} aria-valuemax={heritage.slides.length}
-        aria-label={`Slide ${slideIndex + 1} of ${heritage.slides.length}`}>
+      {/* Progress rail */}
+      <div
+        className={styles.progressRail}
+        role="progressbar"
+        aria-valuenow={slideIndex + 1}
+        aria-valuemax={heritage.slides.length}
+        aria-label={`Slide ${slideIndex + 1} of ${heritage.slides.length}`}
+      >
         {heritage.slides.map((_, i) => (
-          <div key={i} className={`${styles.dot} ${i === slideIndex ? styles.active : i < slideIndex ? styles.done : ''}`} />
+          <div
+            key={i}
+            className={`${styles.progressDot} ${i === slideIndex ? styles.progressDotActive : i < slideIndex ? styles.progressDotDone : ''}`}
+          />
         ))}
       </div>
 
@@ -149,10 +218,18 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
                   </svg>
                 </div>
               </div>
-              <div className={styles.slideTitle}>
+
+              {/* Slide title with fade-in animation */}
+              <motion.div
+                className={styles.slideTitle}
+                key={`title-${slide.id}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
+              >
                 <h2>{lang === 'ko' ? slide.title.ko : slide.title.en}</h2>
                 <p>{lang === 'ko' ? slide.subtitle.ko : slide.subtitle.en}</p>
-              </div>
+              </motion.div>
             </motion.div>
           </AnimatePresence>
 
@@ -197,10 +274,19 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
 
         {/* Right: Dot Pad + TTS */}
         <div className={styles.right}>
-          <DotPadOutputPanel
-            matrix={matrix}
-            brailleText={slide.brailleText}
-          />
+          {/* WOW #2 — Focus Point Bridge: jade-glow wrapper */}
+          <div className={`${styles.dotpadWrapper} ${focusHighlight ? styles.dotpadWrapperFocus : ''} ${tactileScanning ? styles.dotpadWrapperScanning : ''}`}>
+            <DotPadOutputPanel
+              matrix={currentMatrix}
+              brailleText={slide.brailleText}
+              scanning={tactileScanning}
+              currentLayer={currentLayer}
+              onLayerChange={setCurrentLayer}
+              showLayerControls={true}
+              heritageName={heritage.title.ko}
+              slideLabel={slideLabel}
+            />
+          </div>
           <TTSNarrationPanel text={slide.ttsText} autoPlay={mode === 'museum' || mode === 'school'} />
         </div>
       </div>
@@ -213,6 +299,17 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
           disabled={slideIndex === 0}
           aria-label="Previous slide"
         >← {lang === 'ko' ? '이전' : 'Prev'}</button>
+
+        {/* WOW #2 — TACTILE FOCUS button */}
+        <button
+          className={styles.tactileBtn}
+          onClick={triggerFocusHighlight}
+          aria-label="Tactile Focus — highlight current point on Dot Pad"
+        >
+          <span aria-hidden="true">⬡</span>
+          {lang === 'ko' ? '촉각 포커스' : 'TACTILE FOCUS'}
+        </button>
+
         <button
           className={`${styles.navBtn} ${styles.outputBtn}`}
           aria-label="Send to Dot Pad"
@@ -231,7 +328,7 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
           heritageTitle={heritage.title.ko}
           mode={mode ?? 'standard'}
           totalSlides={heritage.slides.length}
-          onRestart={() => { setSlideIndex(0); setCompleted(false); onSlideChange?.(0); }}
+          onRestart={() => { setSlideIndex(0); setCompleted(false); onSlideChange?.(0); syncLayer(0); }}
           onMore={onBack ?? (() => {})}
         />
       )}

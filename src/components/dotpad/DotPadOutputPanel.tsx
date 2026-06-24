@@ -1,42 +1,116 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import type { DotMatrix } from '../../types/heritage';
 import { DotPadGrid } from './DotPadGrid';
 import { DotPadStatus } from '../ui/DotPadStatus';
 import styles from './DotPadOutputPanel.module.css';
 
+export type TactileLayerType = 'silhouette' | 'structure' | 'detail' | 'focus';
+
+const LAYER_LABELS: Record<TactileLayerType, { ko: string; en: string; desc: string }> = {
+  silhouette: { ko: '전체 윤곽', en: 'Silhouette', desc: '유물의 전체 외곽 형태' },
+  structure:  { ko: '구조',     en: 'Structure',  desc: '주요 구조와 부분 구분' },
+  detail:     { ko: '문양',     en: 'Detail',     desc: '세부 문양과 장식' },
+  focus:      { ko: '핵심',     en: 'Focus',      desc: '해설 핵심 포인트' },
+};
+
 interface Props {
   matrix: DotMatrix;
-
   brailleText?: string[];
+  scanning?: boolean;
+  currentLayer?: TactileLayerType;
+  onLayerChange?: (layer: TactileLayerType) => void;
+  showLayerControls?: boolean;
+  heritageName?: string;
+  slideLabel?: string;
 }
 
-export function DotPadOutputPanel({ matrix, brailleText }: Props) {
+export function DotPadOutputPanel({
+  matrix,
+  brailleText = [],
+  scanning = false,
+  currentLayer = 'silhouette',
+  onLayerChange,
+  showLayerControls = false,
+  heritageName,
+  slideLabel,
+}: Props) {
   const [animating, setAnimating] = useState(false);
-  const prevMatrix = useRef<DotMatrix | null>(null);
 
-  useEffect(() => {
-    if (prevMatrix.current !== null) {
-      setAnimating(true);
-      const t = setTimeout(() => setAnimating(false), 1200);
-      return () => clearTimeout(t);
-    }
-    prevMatrix.current = matrix;
-  }, [matrix]);
+  const handleLayerChange = (layer: TactileLayerType) => {
+    setAnimating(true);
+    setTimeout(() => setAnimating(false), 800);
+    onLayerChange?.(layer);
+  };
+
+  const layerInfo = LAYER_LABELS[currentLayer];
 
   return (
-    <div className={styles.panel}>
+    <div className={styles.panel} role="region" aria-label="Dot Pad 촉각그래픽 미리보기">
+      {/* Header */}
       <div className={styles.header}>
-        <span className={styles.dot}>⬡</span>
-        <span className={styles.headerText}>DOT PAD OUTPUT PREVIEW</span>
+        <div className={styles.headerLeft}>
+          <span className={styles.deviceIcon} aria-hidden="true">⋮⋮</span>
+          <span className={styles.title}>DOT PAD PREVIEW</span>
+        </div>
         <DotPadStatus />
       </div>
-      <DotPadGrid matrix={matrix} animating={animating} />
-      {brailleText && brailleText.length > 0 && (
-        <div className={styles.braille} aria-label="Braille summary">
-          <div className={styles.brailleLabel}>BRAILLE SUMMARY</div>
-          {brailleText.map((line, i) => (
-            <div key={i} className={styles.brailleLine}>{line}</div>
+
+      {/* Heritage label */}
+      {(heritageName || slideLabel) && (
+        <div className={styles.heritageLabel}>
+          {heritageName && <span className={styles.heritageName}>{heritageName}</span>}
+          {slideLabel && <span className={styles.slideLabel}>{slideLabel}</span>}
+        </div>
+      )}
+
+      {/* Layer controls */}
+      {showLayerControls && (
+        <div className={styles.layerControls} role="group" aria-label="촉각 레이어 선택">
+          {(Object.keys(LAYER_LABELS) as TactileLayerType[]).map((layer) => (
+            <button
+              key={layer}
+              className={`${styles.layerBtn} ${currentLayer === layer ? styles.layerBtnActive : ''}`}
+              onClick={() => handleLayerChange(layer)}
+              aria-pressed={currentLayer === layer}
+              title={LAYER_LABELS[layer].desc}
+            >
+              {LAYER_LABELS[layer].en}
+            </button>
           ))}
+        </div>
+      )}
+
+      {/* Dot grid */}
+      <div className={styles.gridWrapper}>
+        <DotPadGrid matrix={matrix} animating={animating} scanning={scanning} />
+
+        {/* Layer label overlay */}
+        <div className={styles.layerOverlay} aria-live="polite">
+          <span className={styles.layerName}>{layerInfo.en.toUpperCase()}</span>
+          <span className={styles.layerDesc}>{layerInfo.ko}</span>
+        </div>
+      </div>
+
+      {/* Grid specs */}
+      <div className={styles.specs}>
+        <span className={styles.spec}>60 × 40</span>
+        <span className={styles.specDot}>·</span>
+        <span className={styles.spec}>2,400 cells</span>
+        {scanning && <span className={styles.specScanning} aria-live="polite">SCANNING...</span>}
+      </div>
+
+      {/* Braille section */}
+      {brailleText.length > 0 && (
+        <div className={styles.brailleSection} aria-label="점자 텍스트">
+          <div className={styles.brailleHeader}>
+            <span className={styles.brailleIcon} aria-hidden="true">⠿</span>
+            <span className={styles.brailleTitle}>BRAILLE TEXT</span>
+          </div>
+          <div className={styles.brailleLines}>
+            {brailleText.map((line, i) => (
+              <div key={i} className={styles.brailleLine}>{line}</div>
+            ))}
+          </div>
         </div>
       )}
     </div>

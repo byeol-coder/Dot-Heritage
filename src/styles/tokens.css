@@ -1,28 +1,191 @@
+/* ========================================
+   DOT HERITAGE — Design Tokens
+   Digital Museum × Tactile Heritage Platform
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
 :root {
-  --deep-navy: #0D1B2A;
-  --ink-navy: #071522;
-  --ivory: #F4F1E8;
-  --ivory-dim: #DDD9CE;
-  --aged-gold: #C8A56A;
-  --soft-gold: #E6C987;
-  --jade: #6FAF9F;
-  --jade-dim: #4E8F80;
-  --stone: #8B8178;
-  --stone-light: #B8B0A6;
+  /* === COLOR PALETTE === */
 
-  --font-serif: 'Noto Serif KR', 'Georgia', serif;
-  --font-sans: 'Noto Sans KR', 'Pretendard', system-ui, sans-serif;
-  --font-mono: 'Courier New', monospace;
+  /* Background / Depth */
+  --void-black:     #030B12;
+  --ink-navy:       #071522;
+  --deep-navy:      #0D1B2A;
+  --surface-2:      #152333;
+  --surface-3:      #1C2E40;
+  --surface-4:      #243649;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Ivory / Text */
+  --ivory:          #F4F1E8;
+  --ivory-dim:      #DDD9CE;
+  --ivory-muted:    #B8B4A8;
+  --ivory-faint:    #7A766E;
 
-  --transition-fast: 200ms ease;
-  --transition-base: 400ms ease;
-  --transition-slow: 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Museum Gold (primary accent) */
+  --aged-gold:      #C8A56A;
+  --soft-gold:      #E6C987;
+  --deep-gold:      #9E7A3F;
+  --pale-gold:      #F0DFB0;
+  --gold-glow:      rgba(200,165,106,0.22);
+  --gold-glow-strong: rgba(200,165,106,0.4);
 
-  --shadow-gold: 0 0 20px rgba(200,165,106,0.25);
-  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  /* Jade / Dot Pad accent */
+  --jade:           #6FAF9F;
+  --jade-dim:       #4E8F80;
+  --jade-bright:    #9FCFC0;
+  --jade-glow:      rgba(111,175,159,0.22);
+
+  /* Stone / Neutral */
+  --stone:          #8B8178;
+  --stone-light:    #B8B0A6;
+  --stone-dark:     #5C554E;
+
+  /* Status */
+  --correct:        #5BAF7A;
+  --wrong:          #C85A4A;
+  --warning:        #C8A52A;
+
+  /* Surfaces (semantic) */
+  --surface-panel:  rgba(13,27,42,0.92);
+  --surface-card:   rgba(21,35,51,0.96);
+  --surface-modal:  rgba(3,11,18,0.92);
+  --spotlight:      radial-gradient(ellipse at 50% 0%, rgba(200,165,106,0.08) 0%, transparent 65%);
+
+  /* === TYPOGRAPHY === */
+  --font-serif: 'Noto Serif KR', 'Apple Myungjo', Georgia, serif;
+  --font-sans:  'Noto Sans KR', Pretendard, 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --font-mono:  'Courier New', 'Nanum Gothic Coding', monospace;
+
+  /* Type scale */
+  --text-2xs:  0.625rem;   /* 10px */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.8125rem;  /* 13px */
+  --text-base: 0.875rem;   /* 14px */
+  --text-md:   1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  1.875rem;   /* 30px */
+  --text-4xl:  2.25rem;    /* 36px */
+  --text-5xl:  3rem;       /* 48px */
+  --text-6xl:  3.75rem;    /* 60px */
+  --text-7xl:  4.5rem;     /* 72px */
+
+  /* Weights */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Letter spacing */
+  --tracking-tight:   -0.02em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.06em;
+  --tracking-wider:    0.12em;
+  --tracking-widest:   0.22em;
+  --tracking-label:    0.08em;
+
+  /* Line heights */
+  --leading-tight:   1.2;
+  --leading-snug:    1.35;
+  --leading-base:    1.5;
+  --leading-relaxed: 1.7;
+
+  /* === SPACING === */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* === BORDER RADIUS === */
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   10px;
+  --radius-xl:   16px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* === TRANSITIONS === */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --transition-fast:   150ms var(--ease-out);
+  --transition-base:   300ms var(--ease-out);
+  --transition-slow:   600ms var(--ease-out);
+  --transition-reveal: 900ms var(--ease-out);
+
+  /* === SHADOWS === */
+  --shadow-sm:    0 1px 4px rgba(0,0,0,0.35);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.55);
+  --shadow-xl:    0 16px 64px rgba(0,0,0,0.65);
+  --shadow-gold:  0 0 32px rgba(200,165,106,0.28), 0 0 10px rgba(200,165,106,0.18);
+  --shadow-jade:  0 0 28px rgba(111,175,159,0.28), 0 0 8px rgba(111,175,159,0.16);
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.45);
+  --shadow-float: 0 12px 48px rgba(0,0,0,0.6);
+
+  /* === Z-INDEX === */
+  --z-base:      0;
+  --z-raised:    10;
+  --z-panel:     20;
+  --z-sticky:    30;
+  --z-overlay:   40;
+  --z-modal:     50;
+  --z-toast:     60;
+
+  /* === BORDERS === */
+  --border-surface: 1px solid rgba(255,255,255,0.07);
+  --border-subtle:  1px solid rgba(255,255,255,0.10);
+  --border-gold:    1px solid rgba(200,165,106,0.30);
+  --border-jade:    1px solid rgba(111,175,159,0.30);
+  --border-focus:   2px solid var(--aged-gold);
+
+  /* === DOT PAD === */
+  --dot-bg:        #050F1A;
+  --dot-cell:      3.8px;
+  --dot-gap:       2.4px;
+  --dot-dim:       rgba(200,165,106,0.28);
+  --dot-normal:    rgba(200,165,106,0.65);
+  --dot-strong:    #C8A56A;
+  --dot-jade:      #6FAF9F;
+  --dot-scan-dur:  600ms;
+}
+
+/* === HIGH CONTRAST MODE === */
+body.high-contrast {
+  --deep-navy:   #000000;
+  --ink-navy:    #000000;
+  --void-black:  #000000;
+  --surface-2:   #0A0A0A;
+  --surface-3:   #111111;
+  --ivory:       #FFFFFF;
+  --ivory-dim:   #EEEEEE;
+  --ivory-muted: #CCCCCC;
+  --aged-gold:   #FFD700;
+  --soft-gold:   #FFE44D;
+  --jade:        #00FF88;
+  --jade-bright: #44FFAA;
+  --stone:       #AAAAAA;
+  --stone-light: #CCCCCC;
+  --gold-glow:   rgba(255,215,0,0.3);
+  --jade-glow:   rgba(0,255,136,0.3);
+  --border-gold: 1px solid rgba(255,215,0,0.6);
+  --border-jade: 1px solid rgba(0,255,136,0.5);
+  --dot-strong:  #FFD700;
+  --dot-normal:  rgba(255,215,0,0.7);
+  --dot-dim:     rgba(255,215,0,0.3);
 }
