@@ -1,0 +1,13 @@
+.hotspotLabel {
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--deep-navy, #071522);
+  background: var(--aged-gold, #c8a56a);
+  border-radius: 100px;
+  padding: 3px 10px;
+  transform: translateY(-22px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}

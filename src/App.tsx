@@ -3,9 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Home } from './pages/Home';
 import { Collection } from './pages/Collection';
 import { Guide } from './pages/Guide';
+import { Explore } from './pages/Explore';
 import type { AppMode } from './types/heritage';
 
-type Screen = 'home' | 'collection' | 'guide';
+type Screen = 'home' | 'collection' | 'guide' | 'explore';
 
 const pageTransition = {
   initial: { opacity: 0, y: 8 },
@@ -17,10 +18,12 @@ const pageTransition = {
 export default function App() {
   const params = new URLSearchParams(window.location.search);
   const urlHeritage = params.get('heritage');
+  const urlExplore = params.get('explore');
   const urlMode = (params.get('mode') as AppMode) ?? 'museum';
 
-  const [screen, setScreen] = useState<Screen>(urlHeritage ? 'guide' : 'home');
-  const [selectedId, setSelectedId] = useState<string>(urlHeritage ?? 'cheomseongdae');
+  const initialScreen: Screen = urlExplore ? 'explore' : urlHeritage ? 'guide' : 'home';
+  const [screen, setScreen] = useState<Screen>(initialScreen);
+  const [selectedId, setSelectedId] = useState<string>(urlExplore ?? urlHeritage ?? 'cheomseongdae');
   const [mode, setMode] = useState<AppMode>(urlHeritage ? urlMode : 'standard');
 
   const goHome = useCallback(() => setScreen('home'), []);
@@ -36,10 +39,16 @@ export default function App() {
     setScreen('guide');
   }, []);
 
+  const goExplore = useCallback((id: string) => {
+    setSelectedId(id);
+    setScreen('explore');
+  }, []);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (screen === 'guide') setScreen('collection');
+        else if (screen === 'explore') setScreen('guide');
         else if (screen === 'collection') setScreen('home');
       }
       if (e.key === 'F1' && screen === 'guide') {
@@ -55,7 +64,11 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [screen]);
 
-  const screenLabel = screen === 'home' ? '홈 화면' : screen === 'collection' ? '컬렉션 화면' : '해설 가이드 화면';
+  const screenLabel =
+    screen === 'home' ? '홈 화면'
+    : screen === 'collection' ? '컬렉션 화면'
+    : screen === 'explore' ? '3D 촉각 탐색 화면'
+    : '해설 가이드 화면';
 
   return (
     <>
@@ -77,7 +90,12 @@ export default function App() {
         )}
         {screen === 'guide' && (
           <motion.div key="guide" {...pageTransition}>
-            <Guide heritageId={selectedId} mode={mode} onBack={goCollection} />
+            <Guide heritageId={selectedId} mode={mode} onBack={goCollection} onExplore={goExplore} />
+          </motion.div>
+        )}
+        {screen === 'explore' && (
+          <motion.div key="explore" {...pageTransition}>
+            <Explore initialSceneId={selectedId} onBack={() => setScreen('guide')} />
           </motion.div>
         )}
       </AnimatePresence>

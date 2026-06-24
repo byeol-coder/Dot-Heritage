@@ -30,6 +30,20 @@
   border-radius: 3px;
   color: var(--aged-gold);
 }
+.exploreBtn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--jade-bright, #8fd0bf);
+  background: rgba(111,175,159,0.1);
+  border: 1px solid rgba(111,175,159,0.4);
+  border-radius: 100px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.exploreBtn:hover { background: rgba(111,175,159,0.2); }
+.exploreBtn:focus-visible { outline: 2px solid var(--jade, #6FAF9F); outline-offset: 2px; }
 .modeBadgeMuseum {
   border-color: rgba(200,165,106,0.4);
   background: rgba(200,165,106,0.06);

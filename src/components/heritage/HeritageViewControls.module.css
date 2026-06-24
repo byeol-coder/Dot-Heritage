@@ -1,0 +1,80 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--surface-card, rgba(13, 27, 42, 0.6));
+  border: 1px solid rgba(200, 165, 106, 0.15);
+  border-radius: 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.groupLabel {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--stone, #8b8178);
+  min-width: 42px;
+}
+
+.btn {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ivory, #f4f0e8);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.09); }
+
+.chip {
+  font-size: 0.74rem;
+  color: var(--jade, #6faf9f);
+  background: rgba(111, 175, 159, 0.08);
+  border: 1px solid rgba(111, 175, 159, 0.3);
+  border-radius: 100px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip:hover { background: rgba(111, 175, 159, 0.16); }
+
+.active {
+  color: var(--deep-navy, #071522);
+  background: var(--aged-gold, #c8a56a);
+  border-color: var(--aged-gold, #c8a56a);
+  font-weight: 600;
+}
+
+.currentView {
+  margin-left: auto;
+  font-size: 0.74rem;
+  color: var(--aged-gold, #c8a56a);
+  font-weight: 600;
+}
+
+.spacer { flex: 1; }
+
+.keyhint {
+  font-size: 0.64rem;
+  color: var(--stone, #8b8178);
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 8px;
+}
+
+.btn:focus-visible,
+.chip:focus-visible {
+  outline: 2px solid var(--aged-gold, #c8a56a);
+  outline-offset: 2px;
+}

@@ -4,6 +4,7 @@ import { Logo } from '../components/brand/Logo';
 import { HeritageSlidePlayer } from '../components/heritage/HeritageSlidePlayer';
 import { HighContrastToggle } from '../components/ui/HighContrastToggle';
 import { heritageList } from '../data/heritageData';
+import { getScene } from '../data/heritageScenes';
 import type { AppMode } from '../types/heritage';
 import styles from './Guide.module.css';
 
@@ -11,6 +12,7 @@ interface Props {
   heritageId: string;
   mode: AppMode;
   onBack: () => void;
+  onExplore?: (id: string) => void;
 }
 
 const overlayBase: React.CSSProperties = {
@@ -24,8 +26,9 @@ const overlayBase: React.CSSProperties = {
   backdropFilter: 'blur(10px)',
 };
 
-export function Guide({ heritageId, mode, onBack }: Props) {
+export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
   const heritage = heritageList.find(h => h.id === heritageId);
+  const hasSyncScene = getScene(heritageId) != null;
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const isMuseum = mode === 'museum';
@@ -325,6 +328,16 @@ export function Guide({ heritageId, mode, onBack }: Props) {
           </>
         )}
         {isSchool && <span className={`${styles.modeBadge} ${styles.modeBadgeSchool}`}>🎓 School Mode</span>}
+        {hasSyncScene && onExplore && (
+          <button
+            type="button"
+            onClick={() => onExplore(heritageId)}
+            className={styles.exploreBtn}
+            aria-label="3D 촉각 동기 탐색 열기"
+          >
+            🔗 3D 촉각 탐색
+          </button>
+        )}
         <div className={styles.keys} aria-label="Keyboard shortcuts hint">← → navigate · Space play</div>
         <HighContrastToggle />
       </header>

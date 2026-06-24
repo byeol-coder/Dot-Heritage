@@ -1,0 +1,107 @@
+.page {
+  min-height: 100dvh;
+  background: radial-gradient(ellipse at top, #0d2030 0%, #071522 60%);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(200, 165, 106, 0.12);
+  background: rgba(7, 21, 34, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--ivory, #f4f0e8);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.titleBlock { display: flex; flex-direction: column; }
+.title { font-family: var(--font-serif); font-size: 1.2rem; color: var(--ivory, #f4f0e8); }
+.subtitle { font-size: 0.68rem; color: var(--stone, #8b8178); letter-spacing: 0.04em; }
+
+.modeBadge {
+  margin-left: auto;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--jade, #6faf9f);
+  background: rgba(111, 175, 159, 0.1);
+  border: 1px solid rgba(111, 175, 159, 0.3);
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  padding: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
+
+.viewerCol { display: flex; flex-direction: column; gap: 16px; }
+
+.viewerFrame {
+  position: relative;
+  width: 100%;
+  height: 440px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(200, 165, 106, 0.15);
+  background: radial-gradient(ellipse at center, #0d2a3a 0%, #071522 100%);
+}
+@media (max-width: 600px) { .viewerFrame { height: 320px; } }
+
+.viewBadge {
+  position: absolute;
+  top: 12px; right: 14px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--aged-gold, #c8a56a);
+  background: rgba(7, 21, 34, 0.6);
+  border: 1px solid rgba(200, 165, 106, 0.25);
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+
+.dataCredit {
+  position: absolute;
+  left: 12px; bottom: 10px;
+  font-size: 0.6rem;
+  color: rgba(244, 240, 232, 0.5);
+  background: rgba(7, 21, 34, 0.55);
+  border: 1px solid rgba(200, 165, 106, 0.12);
+  border-radius: 5px;
+  padding: 3px 8px;
+}
+
+.description {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ivory-muted, #cfc8bd);
+  margin: 0;
+  padding: 0 4px;
+}
+
+.dotpadCol { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 24px; }
+
+.syncNote {
+  font-size: 0.74rem;
+  color: var(--stone, #8b8178);
+  text-align: center;
+  padding: 8px;
+  border: 1px dashed rgba(200, 165, 106, 0.2);
+  border-radius: 8px;
+}
