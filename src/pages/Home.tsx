@@ -10,6 +10,7 @@ import {
 } from '../engine/tactile/createCheomseongdae';
 import { createKoreanPalaceSilhouette } from '../engine/tactile/createKoreanPalace';
 import type { DotMatrix } from '../types/heritage';
+import { MuseumsSection } from '../components/home/MuseumsSection';
 import styles from './Home.module.css';
 
 interface Props {
@@ -49,7 +50,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     korean: '신라 수막새',
     english: 'Silla Lotus Roof Tile',
     period: '신라 · 7–8세기',
-    emoji: '🌸',
+    emoji: '🪷',
     matrix: createCheomseongdaeBase(),
     braille: ['신라 수막새', '연꽃 문양 기와'],
   },
@@ -278,7 +279,7 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
                 {/* Museum display area */}
                 <div className={styles.cardVisual} aria-hidden="true">
                   <div className={styles.spotlightRing} aria-hidden="true" />
-                  <span className={styles.cardEmoji}>{current.emoji}</span>
+                  <span className={styles.cardEmoji} style={{ fontSize: '4rem', lineHeight: 1 }}>{current.emoji}</span>
                 </div>
 
                 <div className={styles.cardBody}>
@@ -311,7 +312,7 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
           aria-label="Dot Pad live preview"
         >
           <div className={styles.dotpadHeader}>
-            <span className={styles.dotpadTitle}>DOT PAD · TACTILE PREVIEW</span>
+            <span className={styles.dotpadTitle}>DOT PAD · LIVE OUTPUT</span>
             <span className={styles.dotpadStatus}>
               <span className={styles.statusDot} aria-hidden="true">⬤</span> LIVE
             </span>
@@ -342,6 +343,9 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
         </div>
 
       </section>
+
+      {/* ─── MUSEUMS ─── */}
+      <MuseumsSection onStart={onStart} onMuseum={onMuseum} />
 
       {/* ─── MODE SELECTION ─── */}
       <section className={styles.modes} aria-label="Select your experience mode">

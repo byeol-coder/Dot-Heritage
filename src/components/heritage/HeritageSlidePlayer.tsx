@@ -10,7 +10,29 @@ import {
   createCheomseongdaeTop,
   createCheomseongdaeQuiz,
 } from '../../engine/tactile/createCheomseongdae';
-import { Cheomseongdae3D } from './Cheomseongdae3D';
+import {
+  createMoonJarSilhouette,
+  createMoonJarStructure,
+  createMoonJarDetail,
+  createMoonJarFocus,
+  createMoonJarQuiz,
+} from '../../engine/tactile/createMoonJar';
+import {
+  createRoofTileSilhouette,
+  createRoofTileStructure,
+  createRoofTileDetail,
+  createRoofTileFocus,
+  createRoofTileQuiz,
+} from '../../engine/tactile/createRoofTile';
+import {
+  createTraditionalShipSilhouette,
+  createTraditionalShipStructure,
+  createTraditionalShipDetail,
+  createTraditionalShipFocus,
+  createTraditionalShipQuiz,
+} from '../../engine/tactile/createTraditionalShip';
+import { createKoreanPalaceSilhouette, createKoreanPalaceStructure, createKoreanPalaceDetail, createKoreanPalaceFocus } from '../../engine/tactile/createKoreanPalace';
+import { Heritage3D } from './Heritage3D';
 import { DotPadOutputPanel } from '../dotpad/DotPadOutputPanel';
 import type { TactileLayerType } from '../dotpad/DotPadOutputPanel';
 import { TTSNarrationPanel } from '../narration/TTSNarrationPanel';
@@ -19,11 +41,35 @@ import { useSwipe } from '../../hooks/useSwipe';
 import styles from './HeritageSlidePlayer.module.css';
 
 const TACTILE_MAP: Record<string, () => DotMatrix> = {
+  // Cheomseongdae
   'cheomseongdae-silhouette': createCheomseongdaeSilhouette,
   'cheomseongdae-window': createCheomseongdaeWindow,
   'cheomseongdae-base': createCheomseongdaeBase,
   'cheomseongdae-top': createCheomseongdaeTop,
   'cheomseongdae-quiz': createCheomseongdaeQuiz,
+  // Moon Jar
+  'moon-jar-silhouette': createMoonJarSilhouette,
+  'moon-jar-structure': createMoonJarStructure,
+  'moon-jar-detail': createMoonJarDetail,
+  'moon-jar-focus': createMoonJarFocus,
+  'moon-jar-quiz': createMoonJarQuiz,
+  // Roof Tile
+  'roof-tile-silhouette': createRoofTileSilhouette,
+  'roof-tile-structure': createRoofTileStructure,
+  'roof-tile-detail': createRoofTileDetail,
+  'roof-tile-focus': createRoofTileFocus,
+  'roof-tile-quiz': createRoofTileQuiz,
+  // Traditional Ship
+  'traditional-ship-silhouette': createTraditionalShipSilhouette,
+  'traditional-ship-structure': createTraditionalShipStructure,
+  'traditional-ship-detail': createTraditionalShipDetail,
+  'traditional-ship-focus': createTraditionalShipFocus,
+  'traditional-ship-quiz': createTraditionalShipQuiz,
+  // Korean Palace
+  'korean-palace-silhouette': createKoreanPalaceSilhouette,
+  'korean-palace-structure': createKoreanPalaceStructure,
+  'korean-palace-detail': createKoreanPalaceDetail,
+  'korean-palace-focus': createKoreanPalaceFocus,
 };
 
 /** Map a slide's TactileLayer to a TactileLayerType for the DotPad panel */
@@ -204,9 +250,18 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
               <div className={styles.slideLabel}>
                 <span className={styles.slideNum}>{String(slideIndex + 1).padStart(2, '0')} / {String(heritage.slides.length).padStart(2, '0')}</span>
                 <span className={styles.tactileTag}>{slide.tactileLayer.toUpperCase()}</span>
+                {slide.cameraView && (
+                  <span className={styles.cameraViewBadge}>
+                    {slide.cameraView === 'front' ? 'FRONT VIEW'
+                      : slide.cameraView === 'side' ? 'SIDE VIEW'
+                      : slide.cameraView === 'top' ? 'TOP VIEW'
+                      : 'DETAIL'}
+                  </span>
+                )}
               </div>
               <div className={styles.frame3d}>
-                <Cheomseongdae3D
+                <Heritage3D
+                  heritageId={heritage.id}
                   highlightPart={slide.highlightPart}
                   cameraView={slide.cameraView}
                 />
@@ -309,6 +364,14 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
           <span aria-hidden="true">⬡</span>
           {lang === 'ko' ? '촉각 포커스' : 'TACTILE FOCUS'}
         </button>
+
+        {/* Focus Point Bridge banner */}
+        {(slide.interactionType === 'find' || slide.interactionType === 'touch') && slide.focusInstruction && (
+          <div className={styles.focusInstructionBar} role="status" aria-live="polite">
+            <span aria-hidden="true">⬡</span>
+            {lang === 'ko' ? slide.focusInstruction.ko : slide.focusInstruction.en}
+          </div>
+        )}
 
         <button
           className={`${styles.navBtn} ${styles.outputBtn}`}

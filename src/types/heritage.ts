@@ -21,6 +21,8 @@ export type VisualType = '3d' | 'image' | 'diagram';
 export type CameraView = 'front' | 'side' | 'top' | 'detail' | 'section';
 export type AppMode = 'standard' | 'museum' | 'school';
 
+export type TactileLayerType = 'silhouette' | 'structure' | 'detail' | 'focus';
+
 export interface HeritageSlide {
   id: string;
   heritageId: string;
@@ -34,8 +36,19 @@ export interface HeritageSlide {
   tactileLayer: TactileLayer;
   highlightPart?: string;
   interactionType: InteractionType;
+  focusInstruction?: LocalizedText;
   quizOptions?: LocalizedText[];
   quizAnswer?: string;
+}
+
+export interface HeritageMetadata {
+  dataSource: string;
+  curatorVerified: boolean;
+  accessibilityTested: boolean;
+  testDate?: string;
+  recommendedModes: ('museum' | 'school' | 'workshop')[];
+  accessibilityTags: string[];
+  institutionCredit?: string;
 }
 
 export interface Heritage {
@@ -48,5 +61,6 @@ export interface Heritage {
   tactileDifficulty: 'Easy' | 'Medium' | 'Hard';
   recommendedFor: string[];
   thumbnailUrl?: string;
+  metadata?: HeritageMetadata;
   slides: HeritageSlide[];
 }
