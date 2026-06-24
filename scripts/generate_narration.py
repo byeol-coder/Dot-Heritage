@@ -40,8 +40,16 @@ TONE = {
 
 
 def synthesize(api, text, lang, refs, tone):
-    """Call GPT-SoVITS /tts. Adjust params to your server's API."""
+    """Call GPT-SoVITS and return mp3 bytes.
+
+    Default targets the v2 API (`api_v2.py`, the current standard):
+        GET /tts?text=&text_lang=&ref_audio_path=&prompt_text=&prompt_lang=...
+    If you run the older v1 `api.py`, swap to the V1 block below (its params are
+    refer_wav_path / prompt_language / text_language and the route is `/`).
+    """
     ref = refs[lang]
+
+    # --- v2 (api_v2.py) ---
     payload = {
         "text": text,
         "text_lang": lang,
@@ -52,6 +60,18 @@ def synthesize(api, text, lang, refs, tone):
         **tone,
     }
     url = api.rstrip("/") + "/tts?" + urllib.parse.urlencode(payload)
+
+    # --- v1 (api.py) — uncomment to use instead ---
+    # payload = {
+    #     "refer_wav_path": ref["audio"],
+    #     "prompt_text": ref["text"],
+    #     "prompt_language": lang,
+    #     "text": text,
+    #     "text_language": lang,
+    #     "speed": tone.get("speed_factor", 1.0),
+    # }
+    # url = api.rstrip("/") + "/?" + urllib.parse.urlencode(payload)
+
     with urllib.request.urlopen(url, timeout=120) as r:
         return r.read()
 
