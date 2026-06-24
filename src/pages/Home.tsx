@@ -7,8 +7,8 @@ import {
   createCheomseongdaeSilhouette,
   createCheomseongdaeWindow,
   createCheomseongdaeBase,
-  createCheomseongdaeTop,
 } from '../engine/tactile/createCheomseongdae';
+import { createKoreanPalaceSilhouette } from '../engine/tactile/createKoreanPalace';
 import type { DotMatrix } from '../types/heritage';
 import styles from './Home.module.css';
 
@@ -54,12 +54,12 @@ const HERITAGE_LIST: HeritageEntry[] = [
     braille: ['신라 수막새', '연꽃 문양 기와'],
   },
   {
-    korean: '조선 선박',
-    english: 'Joseon Traditional Ship',
+    korean: '조선 전통 전각',
+    english: 'Joseon Palace Hall',
     period: '조선 · 14–19세기',
-    emoji: '⛵',
-    matrix: createCheomseongdaeTop(),
-    braille: ['조선 전통선', '평저형 목선'],
+    emoji: '🏯',
+    matrix: createKoreanPalaceSilhouette(),
+    braille: ['조선 전통 전각', '목조 건축 기둥'],
   },
 ];
 
@@ -194,41 +194,19 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
 
         {/* LEFT — Copy */}
         <div className={styles.copy}>
-          <motion.p
-            className={styles.eyebrow}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            유산을 손끝으로 ─── ⬙
-          </motion.p>
+          <p className={styles.eyebrow}>
+            Dot Heritage · 문화유산 촉각 플랫폼 ── ◈
+          </p>
 
-          <motion.h1
-            className={styles.headline}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.7 }}
-          >
-            Touch the Shape<br />of Heritage
-          </motion.h1>
+          <h1 className={styles.headline}>
+            See, Hear,<br />and Touch Heritage
+          </h1>
 
-          <motion.p
-            className={styles.sub}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-          >
-            Korea's timeless cultural legacy, explored through 3D visuals, TTS narration,
-            and Dot Pad tactile graphics—designed for everyone.
-          </motion.p>
+          <p className={styles.sub}>
+            문화유산을 3D로 보고, 귀로 듣고, 손끝으로 느끼는 Dot Pad 촉각 해설 플랫폼. Designed for everyone.
+          </p>
 
-          <motion.ul
-            className={styles.features}
-            aria-label="Platform features"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.65, duration: 0.5 }}
-          >
+          <ul className={styles.features} aria-label="Platform features">
             {FEATURES.map(f => (
               <li key={f.label} className={styles.feature}>
                 <span className={styles.featureIcon} aria-hidden="true">{f.icon}</span>
@@ -238,41 +216,34 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
                 </div>
               </li>
             ))}
-          </motion.ul>
+          </ul>
 
-          <motion.div
-            className={styles.cta}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-          >
+          <div className={styles.cta}>
             <button className={styles.ctaPrimary} onClick={onStart} aria-label="Start journey">
-              START JOURNEY
+              START TACTILE JOURNEY
             </button>
             <button className={styles.ctaMuseum} onClick={onMuseum} aria-label="Museum mode">
-              🏛 MUSEUM MODE
+              MUSEUM MODE
             </button>
             <button className={styles.ctaSchool} onClick={onSchool} aria-label="School mode">
-              🎓 SCHOOL MODE
+              SCHOOL MODE
             </button>
-          </motion.div>
+          </div>
 
-          <motion.p
-            className={styles.a11yNote}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.0 }}
-          >
+          <p className={styles.a11yNote}>
             <span aria-hidden="true">♿</span> Built for accessibility — designed for everyone.
-          </motion.p>
+          </p>
+
+          <div className={styles.tagList} aria-label="Platform features">
+            {['3D Heritage Guide', 'Dot Pad Tactile Graphics', 'Museum & School'].map(tag => (
+              <span key={tag} className={styles.tag}>{tag}</span>
+            ))}
+          </div>
         </div>
 
         {/* CENTER — Heritage Card Carousel */}
-        <motion.div
+        <div
           className={styles.centerColumn}
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
           aria-label="Heritage showcase carousel"
         >
           <div className={styles.carouselWrapper}>
@@ -294,11 +265,10 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
             </button>
 
             {/* Card */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={activeIndex}
                 className={styles.heritageCard}
-                initial={{ opacity: 0, y: 12, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -12, scale: 0.97 }}
                 transition={{ duration: 0.45, ease: 'easeInOut' }}
@@ -333,25 +303,22 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
               />
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* RIGHT — Dot Pad Live Preview */}
-        <motion.div
+        <div
           className={styles.rightColumn}
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6, duration: 0.7 }}
           aria-label="Dot Pad live preview"
         >
           <div className={styles.dotpadHeader}>
-            <span className={styles.dotpadTitle}>TACTILE PREVIEW · LIVE</span>
+            <span className={styles.dotpadTitle}>DOT PAD · TACTILE PREVIEW</span>
             <span className={styles.dotpadStatus}>
-              <span className={styles.statusDot} aria-hidden="true">⬤</span> DEMO MODE
+              <span className={styles.statusDot} aria-hidden="true">⬤</span> LIVE
             </span>
           </div>
 
           <div className={styles.dotpadPanel}>
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={`dotpad-${activeIndex}`}
                 initial={{ opacity: 0 }}
@@ -369,7 +336,10 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
           </div>
 
           <p className={styles.dotpadFooter}>60×40 Dot Pad Display</p>
-        </motion.div>
+          <p className={styles.dotpadDesc}>
+            Heritage image → tactile dots
+          </p>
+        </div>
 
       </section>
 
