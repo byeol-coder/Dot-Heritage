@@ -14,13 +14,13 @@ export const heritageList: Heritage[] = [
     tactileDifficulty: 'Easy',
     recommendedFor: ['School', 'Museum', 'Intro Demo'],
     metadata: {
-      dataSource: '국립경주박물관 3D 스캔 데이터 (2023)',
+      dataSource: '국가유산청 3D 프린팅 원본 (국보 경주 첨성대) · 공공누리',
       curatorVerified: true,
       accessibilityTested: true,
       testDate: '2024-03',
       recommendedModes: ['museum', 'school', 'workshop'],
       accessibilityTags: ['시각장애', '저시력', '어린이', '고령자'],
-      institutionCredit: '국립경주박물관',
+      institutionCredit: '국가유산청 (Korea Heritage Service)',
     },
     slides: [
       {

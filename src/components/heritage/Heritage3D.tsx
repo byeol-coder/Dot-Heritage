@@ -1,4 +1,4 @@
-import { Cheomseongdae3D } from './Cheomseongdae3D';
+import { CheomseongdaeScan3D } from './CheomseongdaeScan3D';
 import { MoonJar3D } from './MoonJar3D';
 import { RoofTile3D } from './RoofTile3D';
 import { TraditionalShip3D } from './TraditionalShip3D';
@@ -18,6 +18,6 @@ export function Heritage3D({ heritageId, highlightPart, cameraView }: Props) {
     case 'traditional-ship':
       return <TraditionalShip3D highlightPart={highlightPart} cameraView={cameraView} />;
     default:
-      return <Cheomseongdae3D highlightPart={highlightPart} cameraView={cameraView} />;
+      return <CheomseongdaeScan3D highlightPart={highlightPart} cameraView={cameraView} />;
   }
 }

@@ -272,6 +272,12 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
                     <circle cx="35" cy="78" r="3" fill="#C8A56A" opacity="0.8"/>
                   </svg>
                 </div>
+                {/* Source attribution for the 3D data */}
+                {heritage.metadata?.dataSource && (
+                  <div className={styles.dataCredit}>
+                    3D 데이터 출처 · {heritage.metadata.dataSource}
+                  </div>
+                )}
               </div>
 
               {/* Slide title with fade-in animation */}
