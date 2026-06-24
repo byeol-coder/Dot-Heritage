@@ -28,12 +28,7 @@ export function HeritageGlobeHero({ onStart, onMuseum, onSchool }: Props) {
   }, [paused]);
 
   return (
-    <section
-      className={styles.hero}
-      aria-labelledby="globe-hero-title"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
+    <section className={styles.hero} aria-labelledby="globe-hero-title">
       <div className={styles.spaceBackdrop} aria-hidden="true" />
       <div className={styles.orbitOne} aria-hidden="true" />
       <div className={styles.orbitTwo} aria-hidden="true" />
