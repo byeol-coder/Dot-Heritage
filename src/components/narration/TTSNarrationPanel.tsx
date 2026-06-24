@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { LocalizedText } from '../../types/heritage';
-import { speak, cancel } from '../../engine/narration/tts';
+import { playNarration, cancelNarration } from '../../engine/narration/narrationPlayer';
 import { useI18n } from '../../i18n/i18n';
 import styles from './TTSNarrationPanel.module.css';
 
 interface Props {
   text: LocalizedText;
+  /** Narration key for pre-rendered audio (e.g. the slide id). */
+  audioKey?: string;
   autoPlay?: boolean;
 }
 
-export function TTSNarrationPanel({ text, autoPlay = false }: Props) {
+export function TTSNarrationPanel({ text, audioKey, autoPlay = false }: Props) {
   const { lang, tl, t } = useI18n();
   const ttsSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const [playing, setPlaying] = useState(false);
@@ -19,29 +21,29 @@ export function TTSNarrationPanel({ text, autoPlay = false }: Props) {
 
   const handlePlay = useCallback(() => {
     if (playing) {
-      cancel();
+      cancelNarration();
       setPlaying(false);
     } else {
       setPlaying(true);
-      speak(currentText, lang, () => setPlaying(false));
+      playNarration({ key: audioKey, text: currentText, lang, onEnd: () => setPlaying(false) });
     }
-  }, [playing, currentText, lang]);
+  }, [playing, currentText, lang, audioKey]);
 
-  // Stop any active speech when the slide text or language changes.
+  // Stop any active narration when the slide text or language changes.
   useEffect(() => {
-    cancel();
+    cancelNarration();
     setPlaying(false);
     if (autoPlay) {
       const timer = setTimeout(() => {
         setPlaying(true);
-        speak(currentText, lang, () => setPlaying(false));
+        playNarration({ key: audioKey, text: currentText, lang, onEnd: () => setPlaying(false) });
       }, 600);
       return () => clearTimeout(timer);
     }
   }, [text, lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    return () => { cancel(); };
+    return () => { cancelNarration(); };
   }, []);
 
   return (

@@ -4,6 +4,7 @@ import type { Heritage } from '../../types/heritage';
 import type { DotMatrix } from '../../types/heritage';
 import { createEmptyMatrix } from '../../engine/dotpad/matrixUtils';
 import { useDotPad } from '../../engine/dotpad/useDotPad';
+import { playNarration, cancelNarration } from '../../engine/narration/narrationPlayer';
 import {
   createCheomseongdaeWindow,
   createCheomseongdaeBase,
@@ -197,24 +198,18 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
     syncLayer(0);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-narrate the current slide via SpeechSynthesis (museum/school modes).
-  // Speaks tl(slide.ttsText) with utterance.lang derived from the active language.
+  // Auto-narrate the current slide (museum/school modes): pre-rendered audio
+  // when available, else the browser voice — both via the narration player.
   useEffect(() => {
     if (!(mode === 'museum' || mode === 'school')) return;
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     const current = heritage.slides[slideIndex];
     if (!current) return;
     const timer = setTimeout(() => {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(tl(current.ttsText));
-      utterance.lang = lang === 'ko' ? 'ko-KR' : 'en-US';
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
+      playNarration({ key: current.id, text: tl(current.ttsText), lang });
     }, 600);
     return () => {
       clearTimeout(timer);
-      window.speechSynthesis.cancel();
+      cancelNarration();
     };
   }, [slideIndex, lang, mode, heritage.slides, tl]);
 
@@ -369,7 +364,7 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
               slideLabel={slideLabel}
             />
           </div>
-          <TTSNarrationPanel text={slide.ttsText} autoPlay={false} />
+          <TTSNarrationPanel text={slide.ttsText} audioKey={slide.id} autoPlay={false} />
         </div>
       </div>
 

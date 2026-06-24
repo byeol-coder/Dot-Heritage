@@ -20,7 +20,7 @@ interface Props {
 type StaticView = Exclude<HeritageViewType, 'focus'>;
 
 export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
-  const { t, tl } = useI18n();
+  const { t, tl, lang } = useI18n();
   const startIdx = Math.max(0, heritageScenes.findIndex((s) => s.id === initialSceneId));
   const [sceneIdx, setSceneIdx] = useState(startIdx === -1 ? 0 : startIdx);
   const [view, setView] = useState<HeritageViewType>('front');
@@ -47,6 +47,7 @@ export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
     brailleText: active.brailleText,
     description: active.description,
     narration: active.narration,
+    lang,
     immediate: !!selectedHotspot, // hotspot selection sends instantly
   });
 

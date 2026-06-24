@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { DotMatrix } from '../types/heritage';
 import type { TactilePattern } from '../types/tactileSync';
+import type { Lang } from '../engine/narration/tts';
 import { getPatternMatrix } from '../data/tactilePatterns';
+import { playNarration } from '../engine/narration/narrationPlayer';
 import { useDotPad } from '../engine/dotpad/useDotPad';
 
 interface SyncInput {
@@ -10,6 +12,8 @@ interface SyncInput {
   description: string;
   /** Spoken when the active pattern changes (hotspot narration / view desc). */
   narration?: string;
+  /** Active language for narration (audio + Web Speech). */
+  lang?: Lang;
   /** Skip the debounce — true for hotspot/key actions (send immediately). */
   immediate?: boolean;
   /** ms to wait after the last change before pushing (rotation debounce). */
@@ -27,6 +31,7 @@ export function useTactileSync({
   brailleText,
   description,
   narration,
+  lang = 'ko',
   immediate = false,
   debounceMs = 350,
   speak = true,
@@ -60,14 +65,12 @@ export function useTactileSync({
           inFlightRef.current = false;
         }
       }
-      if (speak && narrate && typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(narrate);
-        u.lang = 'ko-KR';
-        window.speechSynthesis.speak(u);
+      if (speak && narrate) {
+        // patternId doubles as the pre-rendered audio key (e.g. moon-jar-front).
+        playNarration({ key: id, text: narrate, lang });
       }
     },
-    [isConnected, sendMatrix, speak],
+    [isConnected, sendMatrix, speak, lang],
   );
 
   useEffect(() => {
@@ -95,13 +98,9 @@ export function useTactileSync({
   /** Re-speak the current description (panning "reread" key). */
   const reread = useCallback(
     (text: string) => {
-      if (typeof window === 'undefined' || !window.speechSynthesis) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'ko-KR';
-      window.speechSynthesis.speak(u);
+      playNarration({ key: pattern.patternId, text, lang });
     },
-    [],
+    [pattern.patternId, lang],
   );
 
   return { pattern, isConnected, lastSentAt, resend, reread };
