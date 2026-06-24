@@ -50,6 +50,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     english: 'White Porcelain Moon Jar',
     period: { ko: '조선 · 17–18세기', en: 'Joseon · 17th–18th c.' },
     emoji: '🏺',
+    image: `${ASSET}assets/heritage/moon-jar.jpg`,
     matrix: createCheomseongdaeWindow(),
     braille: ['백자 달항아리', '조선 백색 원형'],
   },
