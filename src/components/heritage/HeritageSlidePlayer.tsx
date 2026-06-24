@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { Heritage } from '../../types/heritage';
 import type { DotMatrix } from '../../types/heritage';
 import { createEmptyMatrix } from '../../engine/dotpad/matrixUtils';
+import { useDotPad } from '../../engine/dotpad/useDotPad';
 import {
   createCheomseongdaeWindow,
   createCheomseongdaeBase,
@@ -104,6 +105,7 @@ interface Props {
 
 export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlideChange }: Props) {
   const { t, tl, lang } = useI18n();
+  const { isConnected, connect, sendMatrix } = useDotPad();
   const [slideIndex, setSlideIndex] = useState(0);
   const [quizSelected, setQuizSelected] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
@@ -400,9 +402,18 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
 
         <button
           className={`${styles.navBtn} ${styles.outputBtn}`}
+          onClick={() => {
+            // Web Bluetooth pairing must run inside this click gesture.
+            if (isConnected) {
+              sendMatrix(currentMatrix);
+            } else {
+              connect();
+            }
+            triggerTactileScan();
+          }}
           aria-label={t('slide.dotPadOutputAria')}
         >
-          ⬡ {t('slide.dotPadOutput')}
+          ⬡ {isConnected ? t('slide.dotPadOutput') : t('slide.dotPadConnect')}
         </button>
         <button
           className={`${styles.navBtn} ${styles.nextBtn}`}
