@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Logo } from '../components/brand/Logo';
 import { HighContrastToggle } from '../components/ui/HighContrastToggle';
 import { DotPadOutputPanel } from '../components/dotpad/DotPadOutputPanel';
@@ -28,9 +28,12 @@ interface HeritageEntry {
   english: string;
   period: LocalizedText;
   emoji: string;
+  image?: string;
   matrix: DotMatrix;
   braille: string[];
 }
+
+const ASSET = import.meta.env.BASE_URL;
 
 const HERITAGE_LIST: HeritageEntry[] = [
   {
@@ -38,6 +41,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     english: 'Cheomseongdae Observatory',
     period: { ko: '신라 선덕여왕 · 7세기', en: 'Silla, Queen Seondeok · 7th c.' },
     emoji: '🏛',
+    image: `${ASSET}assets/heritage/cheomseongdae.jpg`,
     matrix: createCheomseongdaeSilhouette(),
     braille: ['첨성대 신라', '원형 석조탑'],
   },
@@ -54,6 +58,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     english: 'Silla Lotus Roof Tile',
     period: { ko: '신라 · 7–8세기', en: 'Silla · 7th–8th c.' },
     emoji: '🪷',
+    image: `${ASSET}assets/heritage/roof-tile.jpg`,
     matrix: createCheomseongdaeBase(),
     braille: ['신라 수막새', '연꽃 문양 기와'],
   },
@@ -62,6 +67,7 @@ const HERITAGE_LIST: HeritageEntry[] = [
     english: 'Joseon Palace Hall',
     period: { ko: '조선 · 14–19세기', en: 'Joseon · 14th–19th c.' },
     emoji: '🏯',
+    image: `${ASSET}assets/heritage/palace.jpg`,
     matrix: createKoreanPalaceSilhouette(),
     braille: ['조선 전통 전각', '목조 건축 기둥'],
   },
@@ -274,21 +280,31 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
               ›
             </button>
 
-            {/* Card */}
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={activeIndex}
-                className={styles.heritageCard}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -12, scale: 0.97 }}
-                transition={{ duration: 0.45, ease: 'easeInOut' }}
-                role="group"
-                aria-label={`${t('home.carousel.itemAria')}: ${tl(current.name)}`}
-              >
+            {/* Card — keyed motion (no AnimatePresence exit, which can stall
+                under React 19 StrictMode and freeze the carousel). */}
+            <motion.div
+              key={activeIndex}
+              className={styles.heritageCard}
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              role="group"
+              aria-label={`${t('home.carousel.itemAria')}: ${tl(current.name)}`}
+            >
                 {/* Museum display area */}
                 <div className={styles.cardVisual} aria-hidden="true">
                   <div className={styles.spotlightRing} aria-hidden="true" />
-                  <span className={styles.cardEmoji} style={{ fontSize: '4rem', lineHeight: 1 }}>{current.emoji}</span>
+                  {current.image ? (
+                    <img
+                      src={current.image}
+                      alt=""
+                      className={styles.cardImage}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span className={styles.cardEmoji} style={{ fontSize: '4rem', lineHeight: 1 }}>{current.emoji}</span>
+                  )}
                 </div>
 
                 <div className={styles.cardBody}>
@@ -296,8 +312,7 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
                   <p className={styles.cardEnglish}>{current.english}</p>
                   <p className={styles.cardPeriod}>{tl(current.period)}</p>
                 </div>
-              </motion.div>
-            </AnimatePresence>
+            </motion.div>
           </div>
 
           {/* Slide dots */}
@@ -328,21 +343,18 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
           </div>
 
           <div className={styles.dotpadPanel}>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={`dotpad-${activeIndex}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <DotPadOutputPanel
-                  matrix={current.matrix}
-                  brailleText={current.braille}
-                  scanning={scanning}
-                />
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              key={`dotpad-${activeIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <DotPadOutputPanel
+                matrix={current.matrix}
+                brailleText={current.braille}
+                scanning={scanning}
+              />
+            </motion.div>
           </div>
 
           <p className={styles.dotpadFooter}>{t('home.dotpad.footer')}</p>
