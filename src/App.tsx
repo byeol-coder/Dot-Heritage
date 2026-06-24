@@ -55,16 +55,16 @@ export default function App() {
       }
       if (e.key === 'F1' && screen === 'guide') {
         e.preventDefault();
-        alert('현재 슬라이드: 화살표 키로 이전/다음 슬라이드로 이동하세요.');
+        alert(t('guide.help.f1'));
       }
       if (e.key === 'F2' && screen === 'guide') {
         e.preventDefault();
-        alert('현재 닷패드 촉각 그래픽: Space 키로 TTS를 재생하세요.');
+        alert(t('guide.help.f2'));
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [screen]);
+  }, [screen, t]);
 
   const screenLabel = t(`screen.${screen}`);
 

@@ -61,6 +61,14 @@ export const dict: Record<string, { ko: string; en: string }> = {
     en: 'Keys · 1 Front 2 Side 3 Detail · [ ] cycle points · \\ clear · R re-read · S resend · , . switch item',
   },
 
+  'guide.help.f1': {
+    ko: '현재 슬라이드: 화살표 키로 이전/다음 슬라이드로 이동하세요.',
+    en: 'Slides: use the arrow keys to move to the previous/next slide.',
+  },
+  'guide.help.f2': {
+    ko: '현재 닷패드 촉각 그래픽: Space 키로 TTS를 재생하세요.',
+    en: 'Tactile graphic: press Space to play the narration.',
+  },
   'tts.unsupported': {
     ko: '이 브라우저는 음성 읽기를 지원하지 않습니다. 텍스트로 해설을 읽어보세요.',
     en: 'This browser does not support speech. Please read the narration text.',
