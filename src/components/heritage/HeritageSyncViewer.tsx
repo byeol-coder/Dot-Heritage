@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { HeritageScene, HeritageViewType } from '../../types/tactileSync';
 import { detectViewType } from '../../hooks/useHeritageViewDetection';
+import { useI18n } from '../../i18n/i18n';
 import styles from './HeritageSyncViewer.module.css';
 
 const BASE_DISTANCE = 7;
@@ -36,10 +37,12 @@ function Model({ url, sceneId }: { url: string; sceneId: string }) {
 function Hotspots({
   scene,
   selected,
+  labels,
   onSelect,
 }: {
   scene: HeritageScene;
   selected: string | null;
+  labels: Record<string, string>;
   onSelect: (id: string) => void;
 }) {
   return (
@@ -62,7 +65,7 @@ function Hotspots({
             </mesh>
             {active && (
               <Html distanceFactor={8} center>
-                <div className={styles.hotspotLabel}>{h.label}</div>
+                <div className={styles.hotspotLabel}>{labels[h.id]}</div>
               </Html>
             )}
           </group>
@@ -122,20 +125,27 @@ interface Props {
 
 export function HeritageSyncViewer({ scene, selectedHotspot, onSelectHotspot, onViewTypeChange }: Props) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const { tl } = useI18n();
+
+  // Resolve hotspot labels outside the Canvas (R3F doesn't bridge outer context).
+  const labels = useMemo(
+    () => Object.fromEntries(scene.hotspots.map((h) => [h.id, tl(h.label)])),
+    [scene, tl],
+  );
 
   return (
     <Canvas
       camera={{ position: [0, 0.4, BASE_DISTANCE], fov: 45 }}
       shadows
       style={{ background: 'transparent' }}
-      aria-label={`${scene.name} 3D 인터랙티브 뷰어`}
+      aria-label={`${tl(scene.name)} 3D interactive viewer`}
     >
       <ambientLight intensity={0.35} />
       <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow color="#FFF5E0" />
       <pointLight position={[-3, 2, -3]} intensity={0.4} color="#C8A56A" />
       <Suspense fallback={null}>
         <Model url={scene.modelUrl} sceneId={scene.id} />
-        <Hotspots scene={scene} selected={selectedHotspot} onSelect={onSelectHotspot} />
+        <Hotspots scene={scene} selected={selectedHotspot} labels={labels} onSelect={onSelectHotspot} />
       </Suspense>
       <OrbitControls
         ref={controlsRef}

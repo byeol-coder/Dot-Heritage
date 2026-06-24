@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from '../components/brand/Logo';
 import { HeritageSlidePlayer } from '../components/heritage/HeritageSlidePlayer';
 import { HighContrastToggle } from '../components/ui/HighContrastToggle';
+import { useI18n } from '../i18n/i18n';
+import { LanguageToggle } from '../i18n/LanguageToggle';
 import { heritageList } from '../data/heritageData';
 import { getScene } from '../data/heritageScenes';
 import type { AppMode } from '../types/heritage';
@@ -27,6 +29,7 @@ const overlayBase: React.CSSProperties = {
 };
 
 export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
+  const { t, tl } = useI18n();
   const heritage = heritageList.find(h => h.id === heritageId);
   const hasSyncScene = getScene(heritageId) != null;
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -36,7 +39,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
 
   // Derive progress steps from the heritage's actual slides so each item shows
   // its own structure (not a hardcoded Cheomseongdae outline).
-  const schoolSteps = (heritage?.slides ?? []).map(s => s.title.ko);
+  const schoolSteps = (heritage?.slides ?? []).map(s => tl(s.title));
 
   const [showMuseumEntry, setShowMuseumEntry] = useState(isMuseum);
   const [showSchoolIntro, setShowSchoolIntro] = useState(isSchool);
@@ -50,8 +53,8 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
 
   if (!heritage) return (
     <div className={styles.page}>
-      <button onClick={onBack} className={styles.backBtn}>← Back</button>
-      <p style={{ color: 'var(--stone)', padding: '48px' }}>Heritage not found.</p>
+      <button onClick={onBack} className={styles.backBtn}>{t('common.back')}</button>
+      <p style={{ color: 'var(--stone)', padding: '48px' }}>{t('guide.notFound')}</p>
     </div>
   );
 
@@ -111,7 +114,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                   fontWeight: 600,
                   textTransform: 'uppercase',
                 }}>
-                  EXHIBIT ENTRY DETECTED
+                  {t('guide.museum.entryDetected')}
                 </span>
               </div>
 
@@ -135,7 +138,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                   marginTop: '4px',
                   letterSpacing: '0.03em',
                 }}>
-                  {heritage.title.en}
+                  {tl(heritage.title)}
                 </div>
               </div>
 
@@ -149,9 +152,9 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                 borderRadius: '8px',
                 lineHeight: 1.5,
               }}>
-                <span style={{ color: 'var(--jade, #6FAF9F)', fontWeight: 600 }}>Dot Pad 연결 권장</span>
+                <span style={{ color: 'var(--jade, #6FAF9F)', fontWeight: 600 }}>{t('guide.museum.connectRecommended')}</span>
                 <br />
-                Dot Pad 연결 시 촉각 그래픽 자동 출력
+                {t('guide.museum.connectHint')}
               </div>
 
               {/* Manual dismiss button */}
@@ -170,7 +173,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                   transition: 'opacity 0.2s',
                 }}
               >
-                전시 시작 →
+                {t('guide.museum.startExhibit')}
               </button>
             </motion.div>
           </motion.div>
@@ -218,7 +221,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                     fontWeight: 600,
                     marginBottom: '3px',
                   }}>
-                    School Mode
+                    {t('guide.school.modeLabel')}
                   </div>
                   <div style={{
                     fontFamily: 'var(--font-serif)',
@@ -226,7 +229,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                     fontWeight: 300,
                     color: 'var(--ivory, #f4f0e8)',
                   }}>
-                    오늘의 학습 목표
+                    {t('guide.school.objectivesTitle')}
                   </div>
                 </div>
               </div>
@@ -239,15 +242,15 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                 borderLeft: '2px solid rgba(111,175,159,0.4)',
                 paddingLeft: '12px',
               }}>
-                학습 목표: <strong style={{ color: 'var(--ivory, #f4f0e8)' }}>{heritage.title.ko}</strong>의 구조를 촉각으로 이해합니다
+                {t('guide.school.goalPrefix')} <strong style={{ color: 'var(--ivory, #f4f0e8)' }}>{tl(heritage.title)}</strong>{t('guide.school.goalSuffix')}
               </div>
 
               {/* Objectives */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {[
-                  `${heritage.title.ko}의 전체 형태를 촉각으로 탐색합니다`,
-                  '주요 구조물의 위치를 Dot Pad로 확인합니다',
-                  '퀴즈를 통해 학습 내용을 검증합니다',
+                  `${t('guide.school.obj1Prefix')}${tl(heritage.title)}${t('guide.school.obj1Suffix')}`,
+                  t('guide.school.obj2'),
+                  t('guide.school.obj3'),
                 ].map((objective, i) => (
                   <div
                     key={i}
@@ -289,7 +292,7 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                   transition: 'opacity 0.2s',
                 }}
               >
-                학습 시작 →
+                {t('guide.school.startLearning')}
               </button>
             </motion.div>
           </motion.div>
@@ -298,13 +301,13 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
 
       {/* ─── Sticky header ──────────────────────────────────────────────── */}
       <header className={`${styles.header} ${isMuseum ? styles.headerMuseum : ''}`}>
-        <button onClick={onBack} className={styles.backBtn} aria-label="Back to collection">← Back</button>
+        <button onClick={onBack} className={styles.backBtn} aria-label={t('guide.header.backAria')}>{t('common.back')}</button>
         <Logo size="sm" variant="icon" />
         <div className={styles.headerInfo}>
           <span className={styles.heritageName}>
-            {heritage.title.ko} <span className={styles.heritageEn}>{heritage.title.en}</span>
+            {tl(heritage.title)} <span className={styles.heritageEn}>{heritage.title.en}</span>
           </span>
-          <span className={styles.heritagePeriod}>{heritage.period.ko}</span>
+          <span className={styles.heritagePeriod}>{tl(heritage.period)}</span>
         </div>
         {isMuseum && (
           <>
@@ -320,36 +323,37 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
                 padding: '3px 9px',
                 fontVariantNumeric: 'tabular-nums',
               }}
-              aria-label="전시 번호"
+              aria-label={t('guide.header.exhibitNumberAria')}
             >
               ECH-001
             </span>
-            <span className={`${styles.modeBadge} ${styles.modeBadgeMuseum}`}>🏛 Museum Mode</span>
+            <span className={`${styles.modeBadge} ${styles.modeBadgeMuseum}`}>{t('guide.badge.museum')}</span>
           </>
         )}
-        {isSchool && <span className={`${styles.modeBadge} ${styles.modeBadgeSchool}`}>🎓 School Mode</span>}
+        {isSchool && <span className={`${styles.modeBadge} ${styles.modeBadgeSchool}`}>{t('guide.badge.school')}</span>}
         {hasSyncScene && onExplore && (
           <button
             type="button"
             onClick={() => onExplore(heritageId)}
             className={styles.exploreBtn}
-            aria-label="3D 촉각 동기 탐색 열기"
+            aria-label={t('guide.exploreAria')}
           >
-            🔗 3D 촉각 탐색
+            {t('explore.open')}
           </button>
         )}
-        <div className={styles.keys} aria-label="Keyboard shortcuts hint">← → navigate · Space play</div>
+        <div className={styles.keys} aria-label={t('guide.header.keysHintAria')}>{t('guide.header.keysHint')}</div>
+        <LanguageToggle />
         <HighContrastToggle />
       </header>
 
       {/* ─── School banner + progress steps ────────────────────────────── */}
       {isSchool && (
         <div className={styles.schoolBanner}>
-          <strong>오늘의 학습:</strong> {heritage.title.ko}의 구조 이해하기 — 슬라이드를 넘기며 각 부위를 탐색해보세요.
+          <strong>{t('guide.school.bannerLabel')}</strong> {t('guide.school.bannerPrefix')}{tl(heritage.title)}{t('guide.school.bannerSuffix')}
         </div>
       )}
       {isSchool && (
-        <div className={styles.schoolProgress} role="list" aria-label="학습 진도">
+        <div className={styles.schoolProgress} role="list" aria-label={t('guide.school.progressAria')}>
           {schoolSteps.map((step, i) => {
             const done = currentSlide >= i;
             const passed = currentSlide > i;
@@ -373,9 +377,9 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
       {/* ─── Museum banner ──────────────────────────────────────────────── */}
       {isMuseum && (
         <div className={styles.museumBanner}>
-          <span style={{ marginRight: '6px', opacity: 0.7 }}>전시 번호 ECH-001</span>
+          <span style={{ marginRight: '6px', opacity: 0.7 }}>{t('guide.museum.bannerExhibitNo')}</span>
           &nbsp;·&nbsp;
-          전시 해설 &nbsp;·&nbsp; Dot Pad를 연결하면 각 슬라이드의 촉각 그래픽이 자동으로 출력됩니다.
+          {t('guide.museum.bannerLabel')} &nbsp;·&nbsp; {t('guide.museum.bannerHint')}
         </div>
       )}
 
@@ -392,12 +396,12 @@ export function Guide({ heritageId, mode, onBack, onExplore }: Props) {
       </main>
 
       {/* ─── Keyboard help bar ──────────────────────────────────────────── */}
-      <div className={styles.keyHelp} role="complementary" aria-label="Keyboard help">
-        <span>F1 슬라이드 설명</span>
-        <span>F2 촉각 설명</span>
-        <span>Space TTS</span>
-        <span>← → 이동</span>
-        <span>Esc 뒤로</span>
+      <div className={styles.keyHelp} role="complementary" aria-label={t('guide.keyHelp.aria')}>
+        <span>{t('guide.keyHelp.f1')}</span>
+        <span>{t('guide.keyHelp.f2')}</span>
+        <span>{t('guide.keyHelp.space')}</span>
+        <span>{t('guide.keyHelp.arrows')}</span>
+        <span>{t('guide.keyHelp.esc')}</span>
       </div>
     </div>
   );

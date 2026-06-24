@@ -1,4 +1,5 @@
 import type { HeritageScene, HeritageViewType } from '../../types/tactileSync';
+import { useI18n } from '../../i18n/i18n';
 import styles from './HeritageViewControls.module.css';
 
 interface Props {
@@ -15,19 +16,16 @@ interface Props {
   onNextHeritage: () => void;
 }
 
-const VIEW_LABELS: Record<string, string> = {
-  front: '정면', side: '측면', top: '윗면', detail: '디테일', focus: '핵심 포인트',
-};
-
 export function HeritageViewControls({
   scene, view, selectedHotspot,
   onView, onSelectHotspot, onPrevHotspot, onNextHotspot,
   onReread, onResend, onPrevHeritage, onNextHeritage,
 }: Props) {
+  const { t, tl } = useI18n();
   return (
-    <div className={styles.panel} role="group" aria-label="3D 탐색 조작">
+    <div className={styles.panel} role="group" aria-label={t('explore.syncMode')}>
       <div className={styles.row}>
-        <span className={styles.groupLabel}>VIEW</span>
+        <span className={styles.groupLabel}>{t('controls.view')}</span>
         {(['front', 'side', 'detail'] as const).map((v) => (
           <button
             key={v}
@@ -35,18 +33,18 @@ export function HeritageViewControls({
             onClick={() => onView(v)}
             aria-pressed={view === v && !selectedHotspot}
           >
-            {VIEW_LABELS[v]}
+            {t(`view.${v}`)}
           </button>
         ))}
         <span className={styles.currentView} aria-live="polite">
-          현재: {selectedHotspot ? '핵심 포인트' : VIEW_LABELS[view]}
+          {t('controls.current')}: {selectedHotspot ? t('view.focus') : t(`view.${view}`)}
         </span>
       </div>
 
       <div className={styles.row}>
-        <span className={styles.groupLabel}>POINT</span>
-        <button className={styles.btn} onClick={onPrevHotspot} aria-label="이전 핵심 포인트">‹ 이전</button>
-        <button className={styles.btn} onClick={onNextHotspot} aria-label="다음 핵심 포인트">다음 ›</button>
+        <span className={styles.groupLabel}>{t('controls.point')}</span>
+        <button className={styles.btn} onClick={onPrevHotspot} aria-label={t('controls.prev')}>{t('controls.prev')}</button>
+        <button className={styles.btn} onClick={onNextHotspot} aria-label={t('controls.next')}>{t('controls.next')}</button>
         {scene.hotspots.map((h) => (
           <button
             key={h.id}
@@ -54,22 +52,20 @@ export function HeritageViewControls({
             onClick={() => onSelectHotspot(selectedHotspot === h.id ? null : h.id)}
             aria-pressed={selectedHotspot === h.id}
           >
-            {h.label}
+            {tl(h.label)}
           </button>
         ))}
       </div>
 
       <div className={styles.row}>
-        <button className={styles.btn} onClick={onReread} aria-label="현재 설명 다시 읽기">🔊 다시 읽기</button>
-        <button className={styles.btn} onClick={onResend} aria-label="Dot Pad에 다시 전송">▶ 다시 전송</button>
+        <button className={styles.btn} onClick={onReread}>{t('controls.reread')}</button>
+        <button className={styles.btn} onClick={onResend}>{t('controls.resend')}</button>
         <span className={styles.spacer} />
-        <button className={styles.btn} onClick={onPrevHeritage} aria-label="이전 문화유산">‹ 이전 유산</button>
-        <button className={styles.btn} onClick={onNextHeritage} aria-label="다음 문화유산">다음 유산 ›</button>
+        <button className={styles.btn} onClick={onPrevHeritage}>{t('controls.prevHeritage')}</button>
+        <button className={styles.btn} onClick={onNextHeritage}>{t('controls.nextHeritage')}</button>
       </div>
 
-      <div className={styles.keyhint}>
-        키보드 · 1 정면 2 측면 3 디테일 · [ ] 포인트 이동 · \ 해제 · R 다시 읽기 · S 재전송 · , . 유산 이동
-      </div>
+      <div className={styles.keyhint}>{t('controls.keyhint')}</div>
     </div>
   );
 }

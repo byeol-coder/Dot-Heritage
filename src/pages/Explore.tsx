@@ -7,6 +7,8 @@ import { HeritageViewControls } from '../components/heritage/HeritageViewControl
 import { useTactileSync } from '../hooks/useTactileSync';
 import { useHotspotNavigation } from '../hooks/useHotspotNavigation';
 import { heritageScenes } from '../data/heritageScenes';
+import { useI18n } from '../i18n/i18n';
+import { LanguageToggle } from '../i18n/LanguageToggle';
 import type { HeritageViewType } from '../types/tactileSync';
 import styles from './Explore.module.css';
 
@@ -18,6 +20,7 @@ interface Props {
 type StaticView = Exclude<HeritageViewType, 'focus'>;
 
 export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
+  const { t, tl } = useI18n();
   const startIdx = Math.max(0, heritageScenes.findIndex((s) => s.id === initialSceneId));
   const [sceneIdx, setSceneIdx] = useState(startIdx === -1 ? 0 : startIdx);
   const [view, setView] = useState<HeritageViewType>('front');
@@ -25,18 +28,19 @@ export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
 
   const scene = heritageScenes[sceneIdx];
 
-  // Resolve the active tactile definition: hotspot wins, else the view mapping.
+  // Resolve the active tactile definition (current language): hotspot wins,
+  // else the view mapping.
   const active = useMemo(() => {
     if (selectedHotspot) {
       const h = scene.hotspots.find((x) => x.id === selectedHotspot);
       if (h) {
-        return { patternId: h.patternId, brailleText: h.brailleText, description: h.narration, narration: h.narration };
+        return { patternId: h.patternId, brailleText: tl(h.brailleText), description: tl(h.narration), narration: tl(h.narration) };
       }
     }
     const key: StaticView = (view === 'focus' ? 'front' : view) as StaticView;
     const def = scene.tactileViews[key] ?? scene.tactileViews.front!;
-    return { patternId: def.patternId, brailleText: def.brailleText, description: def.description, narration: def.description };
-  }, [scene, view, selectedHotspot]);
+    return { patternId: def.patternId, brailleText: tl(def.brailleText), description: tl(def.description), narration: tl(def.description) };
+  }, [scene, view, selectedHotspot, tl]);
 
   const { pattern, isConnected, resend, reread } = useTactileSync({
     patternId: active.patternId,
@@ -71,19 +75,20 @@ export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
   });
 
   const viewLabel = selectedHotspot
-    ? scene.hotspots.find((h) => h.id === selectedHotspot)?.label ?? '핵심 포인트'
-    : ({ front: '정면', side: '측면', top: '윗면', detail: '디테일', focus: '핵심 포인트' }[view]);
+    ? tl(scene.hotspots.find((h) => h.id === selectedHotspot)?.label) || t('view.focus')
+    : t(`view.${view}`);
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <button onClick={onBack} className={styles.backBtn} aria-label="뒤로">← Back</button>
+        <button onClick={onBack} className={styles.backBtn} aria-label={t('common.back')}>{t('common.back')}</button>
         <Logo size="sm" variant="icon" />
         <div className={styles.titleBlock}>
-          <span className={styles.title}>{scene.name}</span>
-          <span className={styles.subtitle}>3D 촉각 동기 탐색 · See · Hear · Touch</span>
+          <span className={styles.title}>{tl(scene.name)}</span>
+          <span className={styles.subtitle}>{t('explore.subtitle')}</span>
         </div>
-        <span className={styles.modeBadge}>🔗 SYNC MODE</span>
+        <span className={styles.modeBadge}>{t('explore.syncMode')}</span>
+        <LanguageToggle />
         <DotPadStatus />
       </header>
 
@@ -97,7 +102,7 @@ export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
               onViewTypeChange={handleViewTypeChange}
             />
             <div className={styles.viewBadge} aria-live="polite">{viewLabel}</div>
-            <div className={styles.dataCredit}>3D 데이터 출처 · 국가유산청 · 공공누리</div>
+            <div className={styles.dataCredit}>{t('explore.dataCredit')}</div>
           </div>
 
           <HeritageViewControls
@@ -131,13 +136,11 @@ export function Explore({ initialSceneId = 'moon-jar', onBack }: Props) {
           <DotPadOutputPanel
             matrix={pattern.matrix}
             brailleText={[active.brailleText]}
-            heritageName={scene.name}
+            heritageName={tl(scene.name)}
             slideLabel={viewLabel}
           />
           <div className={styles.syncNote}>
-            {isConnected
-              ? '● 실기기 연결됨 — 화면 전환 시 Dot Pad로 자동 전송됩니다.'
-              : '○ Demo 모드 — 상단 상태칩을 눌러 실제 Dot Pad를 연결하세요.'}
+            {isConnected ? t('explore.connectedNote') : t('explore.demoNote')}
           </div>
         </aside>
       </main>

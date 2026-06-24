@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { Collection } from './pages/Collection';
 import { Guide } from './pages/Guide';
 import { Explore } from './pages/Explore';
+import { useI18n } from './i18n/i18n';
 import type { AppMode } from './types/heritage';
 
 type Screen = 'home' | 'collection' | 'guide' | 'explore';
@@ -16,6 +17,7 @@ const pageTransition = {
 };
 
 export default function App() {
+  const { t } = useI18n();
   const params = new URLSearchParams(window.location.search);
   const urlHeritage = params.get('heritage');
   const urlExplore = params.get('explore');
@@ -64,11 +66,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [screen]);
 
-  const screenLabel =
-    screen === 'home' ? '홈 화면'
-    : screen === 'collection' ? '컬렉션 화면'
-    : screen === 'explore' ? '3D 촉각 탐색 화면'
-    : '해설 가이드 화면';
+  const screenLabel = t(`screen.${screen}`);
 
   return (
     <>

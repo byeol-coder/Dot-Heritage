@@ -1,4 +1,4 @@
-import type { DotMatrix } from './heritage';
+import type { DotMatrix, LocalizedText } from './heritage';
 
 /** Discrete tactile views derived from the live 3D camera + interaction. */
 export type HeritageViewType = 'front' | 'side' | 'top' | 'detail' | 'focus';
@@ -14,24 +14,24 @@ export interface ViewSample {
 /** Per-view tactile mapping for a heritage scene. */
 export interface TactileViewDef {
   patternId: string;
-  brailleText: string;   // short status for the 20-cell braille line
-  description: string;   // on-screen / TTS description
+  brailleText: LocalizedText;   // short status for the 20-cell braille line
+  description: LocalizedText;   // on-screen / TTS description
 }
 
 /** A selectable key point on the 3D model. */
 export interface HeritageHotspot {
   id: string;
-  label: string;
+  label: LocalizedText;
   position: [number, number, number];
   patternId: string;
-  brailleText: string;
-  narration: string;
+  brailleText: LocalizedText;
+  narration: LocalizedText;
 }
 
 /** A heritage item as an interactive sync scene. */
 export interface HeritageScene {
   id: string;
-  name: string;
+  name: LocalizedText;
   modelUrl: string;
   /** front/side/top/detail mappings (focus comes from hotspots). */
   tactileViews: Partial<Record<Exclude<HeritageViewType, 'focus'>, TactileViewDef>>;

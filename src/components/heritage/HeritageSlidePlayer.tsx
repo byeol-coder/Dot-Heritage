@@ -4,12 +4,12 @@ import type { Heritage } from '../../types/heritage';
 import type { DotMatrix } from '../../types/heritage';
 import { createEmptyMatrix } from '../../engine/dotpad/matrixUtils';
 import {
-  createCheomseongdaeSilhouette,
   createCheomseongdaeWindow,
   createCheomseongdaeBase,
   createCheomseongdaeTop,
   createCheomseongdaeQuiz,
 } from '../../engine/tactile/createCheomseongdae';
+import { createCheomseongdaeOfficial } from '../../engine/tactile/createCheomseongdaeOfficial';
 import {
   createMoonJarSilhouette,
   createMoonJarStructure,
@@ -38,11 +38,12 @@ import type { TactileLayerType } from '../dotpad/DotPadOutputPanel';
 import { TTSNarrationPanel } from '../narration/TTSNarrationPanel';
 import { CompletionScreen } from '../ui/CompletionScreen';
 import { useSwipe } from '../../hooks/useSwipe';
+import { useI18n } from '../../i18n/i18n';
 import styles from './HeritageSlidePlayer.module.css';
 
 const TACTILE_MAP: Record<string, () => DotMatrix> = {
   // Cheomseongdae
-  'cheomseongdae-silhouette': createCheomseongdaeSilhouette,
+  'cheomseongdae-silhouette': createCheomseongdaeOfficial,
   'cheomseongdae-window': createCheomseongdaeWindow,
   'cheomseongdae-base': createCheomseongdaeBase,
   'cheomseongdae-top': createCheomseongdaeTop,
@@ -104,9 +105,9 @@ interface Props {
   onSlideChange?: (index: number) => void;
 }
 
-export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComplete, onBack, onSlideChange }: Props) {
+export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlideChange }: Props) {
+  const { t, tl, lang } = useI18n();
   const [slideIndex, setSlideIndex] = useState(0);
-  const [lang] = useState<Lang>(initialLang);
   const [quizSelected, setQuizSelected] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [direction, setDirection] = useState(1);
@@ -197,13 +198,34 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
     syncLayer(0);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-narrate the current slide via SpeechSynthesis (museum/school modes).
+  // Speaks tl(slide.ttsText) with utterance.lang derived from the active language.
+  useEffect(() => {
+    if (!(mode === 'museum' || mode === 'school')) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const current = heritage.slides[slideIndex];
+    if (!current) return;
+    const timer = setTimeout(() => {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(tl(current.ttsText));
+      utterance.lang = lang === 'ko' ? 'ko-KR' : 'en-US';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }, 600);
+    return () => {
+      clearTimeout(timer);
+      window.speechSynthesis.cancel();
+    };
+  }, [slideIndex, lang, mode, heritage.slides, tl]);
+
   if (!slide) return null;
 
   const handleQuizSelect = (option: string) => {
     setQuizSelected(option);
     const answerKo = slide.quizAnswer;
-    const answerEn = slide.quizOptions?.find(o => o.ko === answerKo)?.en;
-    const correct = option === (lang === 'ko' ? answerKo : answerEn);
+    const answerOption = slide.quizOptions?.find(o => o.ko === answerKo);
+    const correct = answerOption ? option === tl(answerOption) : option === answerKo;
     setQuizResult(correct ? 'correct' : 'wrong');
   };
 
@@ -252,10 +274,10 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
                 <span className={styles.tactileTag}>{slide.tactileLayer.toUpperCase()}</span>
                 {slide.cameraView && (
                   <span className={styles.cameraViewBadge}>
-                    {slide.cameraView === 'front' ? 'FRONT VIEW'
-                      : slide.cameraView === 'side' ? 'SIDE VIEW'
-                      : slide.cameraView === 'top' ? 'TOP VIEW'
-                      : 'DETAIL'}
+                    {slide.cameraView === 'front' ? t('view.front')
+                      : slide.cameraView === 'side' ? t('view.side')
+                      : slide.cameraView === 'top' ? t('view.top')
+                      : t('view.detail')}
                   </span>
                 )}
               </div>
@@ -275,7 +297,7 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
                 {/* Source attribution for the 3D data */}
                 {heritage.metadata?.dataSource && (
                   <div className={styles.dataCredit}>
-                    3D 데이터 출처 · {heritage.metadata.dataSource}
+                    {t('slide.dataSourcePrefix')} · {heritage.metadata.dataSource}
                   </div>
                 )}
               </div>
@@ -288,19 +310,19 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: 0.1 }}
               >
-                <h2>{lang === 'ko' ? slide.title.ko : slide.title.en}</h2>
-                <p>{lang === 'ko' ? slide.subtitle.ko : slide.subtitle.en}</p>
+                <h2>{tl(slide.title)}</h2>
+                <p>{tl(slide.subtitle)}</p>
               </motion.div>
             </motion.div>
           </AnimatePresence>
 
           {/* Quiz panel */}
           {slide.interactionType === 'quiz' && slide.quizOptions && (
-            <div className={styles.quiz} role="group" aria-label="Quiz">
-              <p className={styles.quizQ}>{lang === 'ko' ? '위치를 선택하세요' : 'Select the location'}</p>
+            <div className={styles.quiz} role="group" aria-label={t('slide.quizGroupLabel')}>
+              <p className={styles.quizQ}>{t('slide.quizPrompt')}</p>
               <div className={styles.quizOptions}>
                 {slide.quizOptions.map((opt, i) => {
-                  const val = lang === 'ko' ? opt.ko : opt.en;
+                  const val = tl(opt);
                   const isSelected = quizSelected === val;
                   const isCorrectAns = opt.ko === slide.quizAnswer;
                   return (
@@ -324,8 +346,8 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
                   className={`${styles.feedback} ${styles[quizResult]}`}
                 >
                   {quizResult === 'correct'
-                    ? (lang === 'ko' ? '정답입니다!' : 'Correct!')
-                    : (lang === 'ko' ? '다시 확인해보세요.' : 'Try again.')
+                    ? t('slide.quizCorrect')
+                    : t('slide.quizWrong')
                   }
                 </motion.p>
               )}
@@ -344,11 +366,11 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
               currentLayer={currentLayer}
               onLayerChange={setCurrentLayer}
               showLayerControls={true}
-              heritageName={heritage.title.ko}
+              heritageName={tl(heritage.title)}
               slideLabel={slideLabel}
             />
           </div>
-          <TTSNarrationPanel text={slide.ttsText} autoPlay={mode === 'museum' || mode === 'school'} />
+          <TTSNarrationPanel text={slide.ttsText} autoPlay={false} />
         </div>
       </div>
 
@@ -358,43 +380,43 @@ export function HeritageSlidePlayer({ heritage, mode, initialLang = 'ko', onComp
           className={styles.navBtn}
           onClick={goPrev}
           disabled={slideIndex === 0}
-          aria-label="Previous slide"
-        >← {lang === 'ko' ? '이전' : 'Prev'}</button>
+          aria-label={t('slide.prevAria')}
+        >← {t('slide.prev')}</button>
 
         {/* WOW #2 — TACTILE FOCUS button */}
         <button
           className={styles.tactileBtn}
           onClick={triggerFocusHighlight}
-          aria-label="Tactile Focus — highlight current point on Dot Pad"
+          aria-label={t('slide.tactileFocusAria')}
         >
           <span aria-hidden="true">⬡</span>
-          {lang === 'ko' ? '촉각 포커스' : 'TACTILE FOCUS'}
+          {t('slide.tactileFocus')}
         </button>
 
         {/* Focus Point Bridge banner */}
         {(slide.interactionType === 'find' || slide.interactionType === 'touch') && slide.focusInstruction && (
           <div className={styles.focusInstructionBar} role="status" aria-live="polite">
             <span aria-hidden="true">⬡</span>
-            {lang === 'ko' ? slide.focusInstruction.ko : slide.focusInstruction.en}
+            {tl(slide.focusInstruction)}
           </div>
         )}
 
         <button
           className={`${styles.navBtn} ${styles.outputBtn}`}
-          aria-label="Send to Dot Pad"
+          aria-label={t('slide.dotPadOutputAria')}
         >
-          ⬡ {lang === 'ko' ? '닷패드 출력' : 'Dot Pad Output'}
+          ⬡ {t('slide.dotPadOutput')}
         </button>
         <button
           className={`${styles.navBtn} ${styles.nextBtn}`}
           onClick={goNext}
-          aria-label="Next slide"
-        >{lang === 'ko' ? '다음' : 'Next'} →</button>
+          aria-label={t('slide.nextAria')}
+        >{t('slide.next')} →</button>
       </div>
 
       {completed && (
         <CompletionScreen
-          heritageTitle={heritage.title.ko}
+          heritageTitle={tl(heritage.title)}
           mode={mode ?? 'standard'}
           totalSlides={heritage.slides.length}
           onRestart={() => { setSlideIndex(0); setCompleted(false); onSlideChange?.(0); syncLayer(0); }}

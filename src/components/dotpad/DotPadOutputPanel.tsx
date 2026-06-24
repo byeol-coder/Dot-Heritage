@@ -3,6 +3,7 @@ import type { DotMatrix } from '../../types/heritage';
 import { DotPadGrid } from './DotPadGrid';
 import { DotPadStatus } from '../ui/DotPadStatus';
 import { useDotPad } from '../../engine/dotpad/useDotPad';
+import { useI18n } from '../../i18n/i18n';
 import styles from './DotPadOutputPanel.module.css';
 
 export type TactileLayerType = 'silhouette' | 'structure' | 'detail' | 'focus';
@@ -37,6 +38,7 @@ export function DotPadOutputPanel({
 }: Props) {
   const [animating, setAnimating] = useState(false);
   const { isConnected, sendMatrix } = useDotPad();
+  const { t } = useI18n();
 
   // Auto-push the current frame to a connected device whenever it changes.
   useEffect(() => {
@@ -52,12 +54,12 @@ export function DotPadOutputPanel({
   const layerInfo = LAYER_LABELS[currentLayer];
 
   return (
-    <div className={styles.panel} role="region" aria-label="Dot Pad 촉각그래픽 미리보기">
+    <div className={styles.panel} role="region" aria-label={t('dotpad.preview')}>
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.deviceIcon} aria-hidden="true">⋮⋮</span>
-          <span className={styles.title}>DOT PAD PREVIEW</span>
+          <span className={styles.title}>{t('dotpad.preview')}</span>
         </div>
         <DotPadStatus />
       </div>
@@ -102,26 +104,26 @@ export function DotPadOutputPanel({
       <div className={styles.specs}>
         <span className={styles.spec}>60 × 40</span>
         <span className={styles.specDot}>·</span>
-        <span className={styles.spec}>2,400 cells</span>
-        {scanning && <span className={styles.specScanning} aria-live="polite">SCANNING...</span>}
+        <span className={styles.spec}>{t('dotpad.cells')}</span>
+        {scanning && <span className={styles.specScanning} aria-live="polite">{t('dotpad.scanning')}</span>}
         {isConnected && (
           <button
             type="button"
             className={styles.sendBtn}
             onClick={() => sendMatrix(matrix)}
-            aria-label="현재 촉각그래픽을 Dot Pad로 다시 전송"
+            aria-label={t('dotpad.send')}
           >
-            ▶ 전송
+            {t('dotpad.send')}
           </button>
         )}
       </div>
 
       {/* Braille section */}
       {brailleText.length > 0 && (
-        <div className={styles.brailleSection} aria-label="점자 텍스트">
+        <div className={styles.brailleSection} aria-label={t('dotpad.braille')}>
           <div className={styles.brailleHeader}>
             <span className={styles.brailleIcon} aria-hidden="true">⠿</span>
-            <span className={styles.brailleTitle}>BRAILLE TEXT</span>
+            <span className={styles.brailleTitle}>{t('dotpad.braille')}</span>
           </div>
           <div className={styles.brailleLines}>
             {brailleText.map((line, i) => (

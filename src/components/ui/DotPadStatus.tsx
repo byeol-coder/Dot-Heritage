@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDotPad } from '../../engine/dotpad/useDotPad';
+import { useI18n } from '../../i18n/i18n';
 import styles from './DotPadStatus.module.css';
 
 /**
@@ -8,6 +9,7 @@ import styles from './DotPadStatus.module.css';
  */
 export function DotPadStatus() {
   const { status, deviceName, lastError, isConnected, isBusy, supported, toggle } = useDotPad();
+  const { t } = useI18n();
   const [showTooltip, setShowTooltip] = useState(false);
 
   // Map adapter status → chip appearance. Disconnected shows DEMO (preview still works).
@@ -18,11 +20,11 @@ export function DotPadStatus() {
     : 'demo';
 
   const label =
-    isConnected ? 'CONNECTED'
-    : status === 'searching' ? 'SEARCHING…'
-    : status === 'connecting' ? 'CONNECTING…'
-    : !supported ? 'OFFLINE'
-    : 'DEMO';
+    isConnected ? t('dotpad.status.connected')
+    : status === 'searching' ? t('dotpad.status.searching')
+    : status === 'connecting' ? t('dotpad.status.connecting')
+    : !supported ? t('dotpad.status.offline')
+    : t('dotpad.status.demo');
 
   return (
     <div className={styles.wrapper}>

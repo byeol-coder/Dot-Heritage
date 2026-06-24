@@ -4,6 +4,7 @@
    ======================================== */
 
 import styles from './MuseumsSection.module.css';
+import { useI18n } from '../../i18n/i18n';
 
 /* ─── Icons (inline SVG) ─── */
 
@@ -273,29 +274,29 @@ function MobileDocentIcon() {
 const SOLUTION_COLUMNS = [
   {
     icon: <TransformIcon />,
-    heading: '3D → Tactile',
-    body: '국가유산 3D/도면 데이터를 Dot Pad 촉각 콘텐츠로 변환합니다. 원본 훼손 없이 디지털 데이터에서 직접 생성.',
+    headingKey: 'museums.solution1Heading',
+    bodyKey: 'museums.solution1Body',
     accent: 'gold' as const,
   },
   {
     icon: <AnywhereIcon />,
-    heading: '어디서나',
-    body: '전시실, 교육실, 이동형 도슨트 프로그램 어디서나 동일한 고품질 촉각 경험을 제공합니다.',
+    headingKey: 'museums.solution2Heading',
+    bodyKey: 'museums.solution2Body',
     accent: 'jade' as const,
   },
   {
     icon: <InclusiveIcon />,
-    heading: '모두를 위해',
-    body: '시각장애·저시력·어린이·고령자·비장애인 모두를 위한 공감각 학습. 접근성과 참여가 함께.',
+    headingKey: 'museums.solution3Heading',
+    bodyKey: 'museums.solution3Body',
     accent: 'stone' as const,
   },
 ];
 
 interface UseCase {
   icon: React.ReactNode;
-  label: string;
-  title: string;
-  desc: string;
+  labelKey: string;
+  titleKey: string;
+  descKey: string;
   badge: string;
   badgeAccent: 'gold' | 'jade' | 'stone';
 }
@@ -303,25 +304,25 @@ interface UseCase {
 const USE_CASES: UseCase[] = [
   {
     icon: <MuseumDisplayIcon />,
-    label: 'Museum Display',
-    title: '전시실 설치형',
-    desc: '상설 전시 공간에 Dot Pad를 설치하여 관람객이 언제든 촉각으로 유물을 탐색할 수 있습니다. 자동 안내 음성 병행.',
+    labelKey: 'museums.useCase1Label',
+    titleKey: 'museums.useCase1Title',
+    descKey: 'museums.useCase1Desc',
     badge: 'PERMANENT',
     badgeAccent: 'gold',
   },
   {
     icon: <EducationRoomIcon />,
-    label: 'Education Room',
-    title: '교육실 프로그램형',
-    desc: '체험 학습실에서 단체 프로그램을 운영합니다. 커리큘럼과 연계된 유물 촉각 탐구, 교사 제어 대시보드 제공.',
+    labelKey: 'museums.useCase2Label',
+    titleKey: 'museums.useCase2Title',
+    descKey: 'museums.useCase2Desc',
     badge: 'EDUCATIONAL',
     badgeAccent: 'jade',
   },
   {
     icon: <MobileDocentIcon />,
-    label: 'Mobile Docent',
-    title: '이동형 도슨트',
-    desc: '큐레이터나 도슨트가 Dot Pad를 들고 이동하며 설명합니다. 소그룹 투어 및 VIP 해설에 최적화.',
+    labelKey: 'museums.useCase3Label',
+    titleKey: 'museums.useCase3Title',
+    descKey: 'museums.useCase3Desc',
     badge: 'FLEXIBLE',
     badgeAccent: 'stone',
   },
@@ -331,25 +332,25 @@ const IMPACT_METRICS = [
   {
     value: '100%',
     label: 'Accessibility Compliance',
-    subLabel: '법적 접근성 기준 충족',
+    subLabelKey: 'museums.metric1Sub',
     accent: 'gold' as const,
   },
   {
     value: '60×40',
     label: 'Dot Pad Resolution',
-    subLabel: '2,400 촉각 핀 디스플레이',
+    subLabelKey: 'museums.metric2Sub',
     accent: 'jade' as const,
   },
   {
-    value: '5개+',
+    valueKey: 'museums.metric3Value',
     label: 'Heritage Items / Session',
-    subLabel: '세션당 유물 콘텐츠 수',
+    subLabelKey: 'museums.metric3Sub',
     accent: 'gold' as const,
   },
   {
-    value: '4개',
+    valueKey: 'museums.metric4Value',
     label: 'Tactile Layers / Heritage',
-    subLabel: '유물당 촉각 레이어 수',
+    subLabelKey: 'museums.metric4Sub',
     accent: 'jade' as const,
   },
 ];
@@ -364,6 +365,7 @@ interface Props {
 /* ─── Component ─── */
 
 export function MuseumsSection({ onStart, onMuseum }: Props) {
+  const { t } = useI18n();
   return (
     <section className={styles.section} aria-labelledby="museums-heading">
 
@@ -373,58 +375,57 @@ export function MuseumsSection({ onStart, onMuseum }: Props) {
       {/* ── Section Header ── */}
       <div className={styles.headerGroup}>
         <p className={styles.eyebrow} id="museums-heading">
-          FOR MUSEUMS &amp; HERITAGE INSTITUTIONS
+          {t('museums.eyebrow')}
         </p>
-        <p className={styles.eyebrowKr}>기관 담당자를 위한 솔루션</p>
+        <p className={styles.eyebrowKr}>{t('museums.eyebrowSub')}</p>
         <div className={styles.headerRule} aria-hidden="true" />
       </div>
 
       {/* ── Problem Statement Card ── */}
-      <div className={styles.problemCard} role="region" aria-label="The Challenge">
+      <div className={styles.problemCard} role="region" aria-label={t('museums.challengeLabel')}>
         <div className={styles.problemIcon} aria-hidden="true">
           <TactileProhibitionIcon />
         </div>
         <div className={styles.problemBody}>
-          <p className={styles.problemLabel}>THE CHALLENGE</p>
-          <h2 className={styles.problemHeadline}>원본 유물은 만질 수 없습니다</h2>
-          <p className={styles.problemSubline}>Visitors cannot touch original artifacts</p>
+          <p className={styles.problemLabel}>{t('museums.challengeLabel')}</p>
+          <h2 className={styles.problemHeadline}>{t('museums.challengeHeadline')}</h2>
           <div className={styles.problemStat}>
             <span className={styles.problemStatNum}>15%+</span>
             <span className={styles.problemStatText}>
-              전 세계 박물관 관람객의 15% 이상이 시각장애 또는 저시력
+              {t('museums.challengeStat')}
             </span>
           </div>
         </div>
       </div>
 
       {/* ── Solution Grid ── */}
-      <div className={styles.solutionGroup} role="region" aria-label="How Dot Heritage solves this">
-        <p className={styles.solutionLabel}>HOW DOT HERITAGE + DOT PAD SOLVES THIS</p>
+      <div className={styles.solutionGroup} role="region" aria-label={t('museums.solutionRegion')}>
+        <p className={styles.solutionLabel}>{t('museums.solutionLabel')}</p>
         <div className={styles.solutionGrid}>
           {SOLUTION_COLUMNS.map((col) => (
             <div
-              key={col.heading}
+              key={col.headingKey}
               className={`${styles.solutionCol} ${styles[`solutionCol--${col.accent}`]}`}
             >
               <div className={styles.solutionIconWrap} aria-hidden="true">
                 {col.icon}
               </div>
-              <h3 className={styles.solutionHeading}>{col.heading}</h3>
-              <p className={styles.solutionBody}>{col.body}</p>
+              <h3 className={styles.solutionHeading}>{t(col.headingKey)}</h3>
+              <p className={styles.solutionBody}>{t(col.bodyKey)}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── Use Cases ── */}
-      <div className={styles.useCasesGroup} role="region" aria-label="Use cases">
-        <p className={styles.useCasesLabel}>DEPLOYMENT SCENARIOS</p>
+      <div className={styles.useCasesGroup} role="region" aria-label={t('museums.useCasesRegion')}>
+        <p className={styles.useCasesLabel}>{t('museums.useCasesLabel')}</p>
         <div className={styles.useCasesRow}>
           {USE_CASES.map((uc) => (
             <div
-              key={uc.title}
+              key={uc.titleKey}
               className={`${styles.useCaseCard} ${styles[`useCaseCard--${uc.badgeAccent}`]}`}
-              aria-label={`${uc.label}: ${uc.title}`}
+              aria-label={`${t(uc.labelKey)}: ${t(uc.titleKey)}`}
             >
               <div className={styles.useCaseIconWrap} aria-hidden="true">
                 {uc.icon}
@@ -435,9 +436,9 @@ export function MuseumsSection({ onStart, onMuseum }: Props) {
                     {uc.badge}
                   </span>
                 </div>
-                <p className={styles.useCaseTitle}>{uc.title}</p>
-                <p className={styles.useCaseSubtitle}>{uc.label}</p>
-                <p className={styles.useCaseDesc}>{uc.desc}</p>
+                <p className={styles.useCaseTitle}>{t(uc.titleKey)}</p>
+                <p className={styles.useCaseSubtitle}>{t(uc.labelKey)}</p>
+                <p className={styles.useCaseDesc}>{t(uc.descKey)}</p>
               </div>
             </div>
           ))}
@@ -445,18 +446,21 @@ export function MuseumsSection({ onStart, onMuseum }: Props) {
       </div>
 
       {/* ── Impact Metrics ── */}
-      <div className={styles.metricsGroup} role="region" aria-label="Impact metrics">
+      <div className={styles.metricsGroup} role="region" aria-label={t('museums.metricsRegion')}>
         <div className={styles.metricsRow}>
-          {IMPACT_METRICS.map((m) => (
-            <div
-              key={m.value}
-              className={`${styles.metricItem} ${styles[`metricItem--${m.accent}`]}`}
-            >
-              <span className={styles.metricValue}>{m.value}</span>
-              <span className={styles.metricLabel}>{m.label}</span>
-              <span className={styles.metricSub}>{m.subLabel}</span>
-            </div>
-          ))}
+          {IMPACT_METRICS.map((m) => {
+            const value = 'value' in m ? m.value : t(m.valueKey);
+            return (
+              <div
+                key={value}
+                className={`${styles.metricItem} ${styles[`metricItem--${m.accent}`]}`}
+              >
+                <span className={styles.metricValue}>{value}</span>
+                <span className={styles.metricLabel}>{m.label}</span>
+                <span className={styles.metricSub}>{t(m.subLabelKey)}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -465,9 +469,9 @@ export function MuseumsSection({ onStart, onMuseum }: Props) {
         <button
           className={styles.ctaPrimary}
           onClick={onMuseum}
-          aria-label="기관 도입 문의"
+          aria-label={t('museums.ctaPrimary')}
         >
-          기관 도입 문의
+          {t('museums.ctaPrimary')}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -475,9 +479,9 @@ export function MuseumsSection({ onStart, onMuseum }: Props) {
         <button
           className={styles.ctaSecondary}
           onClick={onStart}
-          aria-label="체험 시작하기"
+          aria-label={t('museums.ctaSecondary')}
         >
-          체험 시작하기
+          {t('museums.ctaSecondary')}
         </button>
       </div>
 

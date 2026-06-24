@@ -1,0 +1,31 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(200, 165, 106, 0.3);
+  border-radius: 100px;
+  overflow: hidden;
+  background: rgba(7, 21, 34, 0.4);
+}
+
+.opt {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--stone, #8b8178);
+  background: transparent;
+  border: none;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.opt:hover { color: var(--ivory, #f4f0e8); }
+
+.active {
+  color: var(--deep-navy, #071522);
+  background: var(--aged-gold, #c8a56a);
+}
+
+.opt:focus-visible {
+  outline: 2px solid var(--aged-gold, #c8a56a);
+  outline-offset: -2px;
+}

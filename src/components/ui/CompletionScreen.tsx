@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import styles from './CompletionScreen.module.css';
+import { useI18n } from '../../i18n/i18n';
 
 interface Props {
   heritageTitle: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, onMore }: Props) {
+  const { t } = useI18n();
   const isSchool = mode === 'school';
   const isMuseum = mode === 'museum';
 
@@ -48,7 +50,7 @@ export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, 
               color: 'var(--ivory, #f4f0e8)',
               letterSpacing: '0.02em',
             }}>
-              탐색 완료 — 접근성 영향 요약
+              {t('completion.museumHeading')}
             </h2>
           </div>
 
@@ -63,9 +65,11 @@ export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, 
             lineHeight: 1.6,
             textAlign: 'center',
           }}>
-            <strong style={{ color: 'var(--ivory, #f4f0e8)' }}>1명</strong>의 시각장애 관람객이{' '}
-            <strong style={{ color: 'var(--aged-gold, #c8a56a)' }}>{heritageTitle}</strong>을(를){' '}
-            촉각으로 체험했습니다
+            {t('completion.impactSentencePre')}{' '}
+            <strong style={{ color: 'var(--ivory, #f4f0e8)' }}>{t('completion.impactSentenceVisitors')}</strong>{' '}
+            {t('completion.impactSentenceMid')}{' '}
+            <strong style={{ color: 'var(--aged-gold, #c8a56a)' }}>{heritageTitle}</strong>{' '}
+            {t('completion.impactSentencePost')}
           </div>
 
           {/* Stats grid */}
@@ -75,10 +79,10 @@ export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, 
             gap: '10px',
           }}>
             {[
-              { label: '탐색 슬라이드', value: `${totalSlides}개` },
-              { label: '소요 시간', value: `약 ${totalSlides * 2}분` },
-              { label: '촉각 레이어', value: '4개' },
-              { label: '브레일 출력', value: `${totalSlides}행` },
+              { label: t('completion.statSlides'), value: t('completion.statSlidesValue').replace('{count}', String(totalSlides)) },
+              { label: t('completion.statDuration'), value: t('completion.statDurationValue').replace('{minutes}', String(totalSlides * 2)) },
+              { label: t('completion.statLayers'), value: t('completion.statLayersValue') },
+              { label: t('completion.statBraille'), value: t('completion.statBrailleValue').replace('{count}', String(totalSlides)) },
             ].map(({ label, value }) => (
               <div
                 key={label}
@@ -122,7 +126,7 @@ export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, 
             borderTop: '1px solid rgba(200,165,106,0.1)',
             paddingTop: '16px',
           }}>
-            Dot Pad 촉각 해설로 시각장애 관람객의 문화유산 접근성을 높였습니다.
+            {t('completion.impactStatement')}
           </p>
 
           {/* PDF download (visual only) */}
@@ -147,16 +151,16 @@ export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, 
             onClick={() => {/* visual only — no download implemented */}}
           >
             <span style={{ opacity: 0.8 }}>↓</span>
-            기관 보고서 다운로드 (PDF)
+            {t('completion.downloadReport')}
           </button>
 
           {/* Navigation actions */}
           <div className={styles.actions}>
             <button className={styles.btnPrimary} onClick={onMore}>
-              다른 유산 보기 →
+              {t('completion.moreHeritage')}
             </button>
             <button className={styles.btnSecondary} onClick={onRestart}>
-              처음부터 다시
+              {t('completion.restart')}
             </button>
           </div>
         </motion.div>
@@ -175,27 +179,27 @@ export function CompletionScreen({ heritageTitle, mode, totalSlides, onRestart, 
       <div className={styles.card}>
         <div className={styles.icon}>⬡</div>
         <h2 className={styles.title}>
-          {isSchool ? '학습 완료!' : '감상 완료'}
+          {isSchool ? t('completion.schoolTitle') : t('completion.standardTitle')}
         </h2>
         <p className={styles.sub}>
-          {heritageTitle}의 핵심 형태와 구조를<br />
-          {totalSlides}개 슬라이드로 탐색했습니다.
+          {t('completion.subPre')}{heritageTitle}{t('completion.subMid')}<br />
+          {t('completion.subPost').replace('{count}', String(totalSlides))}
         </p>
         {isSchool && (
           <div className={styles.checklist}>
-            <div className={styles.checkItem}>✓ 전체 형태 탐색</div>
-            <div className={styles.checkItem}>✓ 중앙 창 위치 확인</div>
-            <div className={styles.checkItem}>✓ 하단 기단부 이해</div>
-            <div className={styles.checkItem}>✓ 상단 구조 비교</div>
-            <div className={styles.checkItem}>✓ 창 위치 퀴즈 완료</div>
+            <div className={styles.checkItem}>{t('completion.checkOverallForm')}</div>
+            <div className={styles.checkItem}>{t('completion.checkCenterWindow')}</div>
+            <div className={styles.checkItem}>{t('completion.checkBase')}</div>
+            <div className={styles.checkItem}>{t('completion.checkTopStructure')}</div>
+            <div className={styles.checkItem}>{t('completion.checkQuiz')}</div>
           </div>
         )}
         <div className={styles.actions}>
           <button className={styles.btnPrimary} onClick={onMore}>
-            다른 유산 보기 →
+            {t('completion.moreHeritage')}
           </button>
           <button className={styles.btnSecondary} onClick={onRestart}>
-            처음부터 다시
+            {t('completion.restart')}
           </button>
         </div>
       </div>

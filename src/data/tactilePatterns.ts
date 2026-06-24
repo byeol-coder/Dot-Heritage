@@ -12,11 +12,11 @@ import {
   createMoonJarFoot,
 } from '../engine/tactile/createMoonJarViews';
 import {
-  createCheomseongdaeSilhouette,
   createCheomseongdaeWindow,
   createCheomseongdaeBase,
   createCheomseongdaeTop,
 } from '../engine/tactile/createCheomseongdae';
+import { createCheomseongdaeOfficial } from '../engine/tactile/createCheomseongdaeOfficial';
 
 /**
  * Central registry: patternId → 60×40 matrix generator.
@@ -32,9 +32,9 @@ export const tactilePatterns: Record<string, TactilePatternFn> = {
   'moon-jar-hotspot-mouth': createMoonJarFocus,
   'moon-jar-hotspot-equator': createMoonJarEquator,
   'moon-jar-hotspot-foot': createMoonJarFoot,
-  // Cheomseongdae
-  'cheomseongdae-front': createCheomseongdaeSilhouette,
-  'cheomseongdae-side': createCheomseongdaeSilhouette,
+  // Cheomseongdae — official tactile graphic from SVG/DTMS
+  'cheomseongdae-front': createCheomseongdaeOfficial,
+  'cheomseongdae-side': createCheomseongdaeOfficial,
   'cheomseongdae-top': createCheomseongdaeTop,
   'cheomseongdae-detail': createCheomseongdaeBase,
   'cheomseongdae-hotspot-window': createCheomseongdaeWindow,
