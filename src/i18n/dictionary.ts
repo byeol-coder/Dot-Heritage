@@ -10,6 +10,7 @@ export const dict: Record<string, { ko: string; en: string }> = {
   'nav.experience': { ko: '체험', en: 'EXPERIENCE' },
   'nav.education': { ko: '교육', en: 'EDUCATION' },
   'common.back': { ko: '← 뒤로', en: '← Back' },
+  'common.close': { ko: '닫기', en: 'Close' },
 
   // ── Dot Pad panel ────────────────────────────────────────────
   'dotpad.preview': { ko: 'DOT PAD 미리보기', en: 'DOT PAD PREVIEW' },
@@ -26,6 +27,7 @@ export const dict: Record<string, { ko: string; en: string }> = {
   'dotpad.status.searching': { ko: '검색 중…', en: 'SEARCHING…' },
   'dotpad.status.connecting': { ko: '연결 중…', en: 'CONNECTING…' },
   'dotpad.status.offline': { ko: '오프라인', en: 'OFFLINE' },
+  'dotpad.status.reconnect': { ko: '재연결', en: 'RECONNECT' },
 
   // ── Explore (sync) ───────────────────────────────────────────
   'explore.subtitle': { ko: '3D 촉각 동기 탐색 · See · Hear · Touch', en: '3D Tactile Sync · See · Hear · Touch' },

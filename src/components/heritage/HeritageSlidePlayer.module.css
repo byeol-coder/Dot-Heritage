@@ -159,6 +159,14 @@
 
 /* ─── Quiz ───────────────────────────────────────────────────────────── */
 .quiz { display: flex; flex-direction: column; gap: 10px; }
+.quizShake { animation: quizShake 0.45s ease; }
+@keyframes quizShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
 .quizQ { font-size: 0.9rem; color: var(--ivory-dim); }
 .quizOptions { display: flex; gap: 8px; }
 .quizBtn {

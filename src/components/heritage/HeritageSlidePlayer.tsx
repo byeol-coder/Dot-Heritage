@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Heritage } from '../../types/heritage';
 import type { DotMatrix } from '../../types/heritage';
@@ -110,6 +110,7 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
   const [slideIndex, setSlideIndex] = useState(0);
   const [quizSelected, setQuizSelected] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
+  const [quizNeedsAnswer, setQuizNeedsAnswer] = useState(false);
   const [direction, setDirection] = useState(1);
   const [completed, setCompleted] = useState(false);
 
@@ -121,6 +122,11 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
 
   // WOW #2 — Focus Point Bridge
   const [focusHighlight, setFocusHighlight] = useState(false);
+  const focusHighlightTimerRef = useRef<number | null>(null);
+
+  // Keep a stable ref to the latest goNext for use in narration onEnd callbacks.
+  const goNextRef = useRef<() => void>(() => {});
+  const autoAdvanceTimerRef = useRef<number | null>(null);
 
   const slide = heritage.slides[slideIndex];
 
@@ -134,10 +140,14 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
     setTimeout(() => setTactileScanning(false), 900);
   }, []);
 
-  /** Trigger the jade-glow focus highlight for 1500 ms */
+  /** Trigger the jade-glow focus highlight for 1500 ms (cancels any prior timer). */
   const triggerFocusHighlight = useCallback(() => {
+    if (focusHighlightTimerRef.current) window.clearTimeout(focusHighlightTimerRef.current);
     setFocusHighlight(true);
-    setTimeout(() => setFocusHighlight(false), 1500);
+    focusHighlightTimerRef.current = window.setTimeout(() => {
+      setFocusHighlight(false);
+      focusHighlightTimerRef.current = null;
+    }, 1500);
   }, []);
 
   /** Sync layer state whenever the slide index changes */
@@ -149,6 +159,13 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
   }, [heritage.slides]);
 
   const goNext = useCallback(() => {
+    // Block advancing past an unanswered quiz — show a shake prompt instead.
+    const currentSlide = heritage.slides[slideIndex];
+    if (currentSlide?.interactionType === 'quiz' && !quizResult) {
+      setQuizNeedsAnswer(true);
+      window.setTimeout(() => setQuizNeedsAnswer(false), 700);
+      return;
+    }
     if (slideIndex === heritage.slides.length - 1) {
       setCompleted(true);
       onComplete?.();
@@ -164,7 +181,7 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
       setQuizResult(null);
       triggerTactileScan();
     }
-  }, [slideIndex, heritage.slides.length, onComplete, onSlideChange, syncLayer, triggerTactileScan]);
+  }, [slideIndex, quizResult, heritage.slides, onComplete, onSlideChange, syncLayer, triggerTactileScan]);
 
   const goPrev = useCallback(() => {
     if (slideIndex > 0) {
@@ -198,17 +215,36 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
     syncLayer(0);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-narrate the current slide (museum/school modes): pre-rendered audio
-  // when available, else the browser voice — both via the narration player.
+  // Keep goNextRef current so the narration onEnd callback always calls the
+  // latest version of goNext (captures fresh slideIndex, quizResult etc).
+  useEffect(() => { goNextRef.current = goNext; });
+
+  // Auto-narrate in museum/school modes. Museum mode also auto-advances
+  // 2 seconds after the narration finishes.
   useEffect(() => {
     if (!(mode === 'museum' || mode === 'school')) return;
     const current = heritage.slides[slideIndex];
     if (!current) return;
     const timer = setTimeout(() => {
-      playNarration({ key: current.id, text: tl(current.ttsText), lang });
+      playNarration({
+        key: current.id,
+        text: tl(current.ttsText),
+        lang,
+        onEnd: mode === 'museum'
+          ? () => {
+              autoAdvanceTimerRef.current = window.setTimeout(() => {
+                goNextRef.current();
+              }, 2000);
+            }
+          : undefined,
+      });
     }, 600);
     return () => {
       clearTimeout(timer);
+      if (autoAdvanceTimerRef.current) {
+        window.clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
       cancelNarration();
     };
   }, [slideIndex, lang, mode, heritage.slides, tl]);
@@ -312,7 +348,7 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
 
           {/* Quiz panel */}
           {slide.interactionType === 'quiz' && slide.quizOptions && (
-            <div className={styles.quiz} role="group" aria-label={t('slide.quizGroupLabel')}>
+            <div className={`${styles.quiz} ${quizNeedsAnswer ? styles.quizShake : ''}`} role="group" aria-label={t('slide.quizGroupLabel')}>
               <p className={styles.quizQ}>{t('slide.quizPrompt')}</p>
               <div className={styles.quizOptions}>
                 {slide.quizOptions.map((opt, i) => {
@@ -338,6 +374,8 @@ export function HeritageSlidePlayer({ heritage, mode, onComplete, onBack, onSlid
                 <motion.p
                   initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                   className={`${styles.feedback} ${styles[quizResult]}`}
+                  role="alert"
+                  aria-live="assertive"
                 >
                   {quizResult === 'correct'
                     ? t('slide.quizCorrect')

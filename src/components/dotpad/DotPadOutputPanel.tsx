@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { DotMatrix } from '../../types/heritage';
 import { DotPadGrid } from './DotPadGrid';
 import { DotPadStatus } from '../ui/DotPadStatus';
 import { useDotPad } from '../../engine/dotpad/useDotPad';
+import { dotMatrixToHex } from '../../engine/dotpad/dotMatrixToHex';
 import { useI18n } from '../../i18n/i18n';
 import styles from './DotPadOutputPanel.module.css';
 
@@ -39,10 +40,17 @@ export function DotPadOutputPanel({
   const [animating, setAnimating] = useState(false);
   const { isConnected, sendMatrix } = useDotPad();
   const { t } = useI18n();
+  const lastSentHexRef = useRef<string | null>(null);
 
-  // Auto-push the current frame to a connected device whenever it changes.
+  // Auto-push the current frame to a connected device when content changes.
+  // Dedupe by hex content so identical matrices (different object refs) don't
+  // trigger redundant sends on every parent re-render.
   useEffect(() => {
-    if (isConnected) sendMatrix(matrix);
+    if (!isConnected) return;
+    const hex = dotMatrixToHex(matrix);
+    if (hex === lastSentHexRef.current) return;
+    lastSentHexRef.current = hex;
+    sendMatrix(matrix);
   }, [isConnected, matrix, sendMatrix]);
 
   const handleLayerChange = (layer: TactileLayerType) => {

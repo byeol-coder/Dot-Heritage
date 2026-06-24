@@ -52,6 +52,18 @@
   animation: blink 0.8s ease-in-out infinite;
 }
 
+.reconnect {
+  color: var(--incorrect, #d98b8b);
+  border-color: rgba(217,139,139,0.5);
+  background: rgba(217,139,139,0.12);
+  animation: pulse-warn 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-warn {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 0 3px rgba(217,139,139,0.25); }
+}
+
 .chip:disabled {
   cursor: progress;
   opacity: 0.85;

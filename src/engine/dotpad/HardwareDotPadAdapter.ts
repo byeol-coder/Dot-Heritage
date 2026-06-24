@@ -20,6 +20,8 @@ export interface DotPadState {
   deviceName: string;
   lastError: string;
   lastSentDots: number;
+  /** True once a real device has connected at least once this session. */
+  wasConnected: boolean;
 }
 
 type StateListener = (state: DotPadState) => void;
@@ -40,12 +42,15 @@ export class HardwareDotPadAdapter {
   private device: DotDevice | null = null;
   private lastMatrix: DotMatrix | null = null;
   private resendTimers: number[] = [];
+  private connectionTimeout: number | null = null;
+  private static readonly CONNECT_TIMEOUT_MS = 30_000;
 
   private state: DotPadState = {
     status: hasWebBluetooth() ? 'disconnected' : 'unsupported',
     deviceName: '',
     lastError: '',
     lastSentDots: 0,
+    wasConnected: false,
   };
 
   private listeners = new Set<StateListener>();
@@ -89,9 +94,24 @@ export class HardwareDotPadAdapter {
     if (this.device) return;
 
     try {
+      this.clearConnectionTimeout();
       this.setState({ status: 'searching', lastError: '' });
+
+      // Arm a 30-second watchdog so the UI never hangs in "searching" indefinitely.
+      this.connectionTimeout = window.setTimeout(() => {
+        if (this.state.status === 'searching' || this.state.status === 'connecting') {
+          this.device = null;
+          this.setState({
+            status: 'disconnected',
+            lastError: '연결 시간 초과 (30초). 다시 시도하세요.',
+          });
+        }
+        this.connectionTimeout = null;
+      }, HardwareDotPadAdapter.CONNECT_TIMEOUT_MS);
+
       const selected = await this.scanner.startBleScan();
       if (!selected) {
+        this.clearConnectionTimeout();
         this.setState({ status: 'disconnected', lastError: '연결할 Dot Pad를 선택하지 않았습니다.' });
         return;
       }
@@ -99,18 +119,21 @@ export class HardwareDotPadAdapter {
       this.setState({ status: 'connecting' });
       const dev = await this.sdk.connectBleDevice(selected);
       if (!dev) {
+        this.clearConnectionTimeout();
         this.setState({ status: 'disconnected', lastError: 'Dot Pad 연결에 실패했습니다.' });
         return;
       }
 
+      this.clearConnectionTimeout();
       // Treat the returned handle as connected even before the SDK callback.
       this.device = dev;
-      this.setState({ status: 'connected' });
+      this.setState({ status: 'connected', wasConnected: true });
       if (this.lastMatrix) {
         this.sendMatrix(this.lastMatrix);
         this.scheduleResends();
       }
     } catch (error) {
+      this.clearConnectionTimeout();
       this.device = null;
       this.setState({ status: 'disconnected', lastError: errorMessage(error) });
       console.error('[DotPad] connect failed:', error);
@@ -118,6 +141,7 @@ export class HardwareDotPadAdapter {
   }
 
   async disconnect(): Promise<void> {
+    this.clearConnectionTimeout();
     this.clearResends();
     const dev = this.device;
     this.device = null;
@@ -181,14 +205,22 @@ export class HardwareDotPadAdapter {
     this.resendTimers = [];
   }
 
+  private clearConnectionTimeout(): void {
+    if (this.connectionTimeout !== null) {
+      window.clearTimeout(this.connectionTimeout);
+      this.connectionTimeout = null;
+    }
+  }
+
   private handleMessage(device: DotDevice, code: string, data?: string): void {
     if (code === DataCodes.DeviceName) {
       this.setState({ deviceName: data || '' });
       return;
     }
     if (code === DataCodes.Connected) {
+      this.clearConnectionTimeout();
       this.device = device;
-      this.setState({ status: 'connected' });
+      this.setState({ status: 'connected', wasConnected: true });
       // Board info ready — resend the current frame to be safe.
       if (this.lastMatrix) this.sendMatrix(this.lastMatrix);
       return;

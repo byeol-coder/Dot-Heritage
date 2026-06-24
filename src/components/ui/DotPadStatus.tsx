@@ -8,19 +8,24 @@ import styles from './DotPadStatus.module.css';
  * over Web Bluetooth; falls back to a "DEMO" label when no device is attached.
  */
 export function DotPadStatus() {
-  const { status, deviceName, lastError, isConnected, isBusy, supported, toggle } = useDotPad();
+  const { status, deviceName, lastError, isConnected, isBusy, supported, wasConnected, toggle } = useDotPad();
   const { t } = useI18n();
   const [showTooltip, setShowTooltip] = useState(false);
 
+  // wasConnected && !isConnected means the device dropped during this session.
+  const dropped = wasConnected && !isConnected && !isBusy;
+
   // Map adapter status → chip appearance. Disconnected shows DEMO (preview still works).
   const visual =
-    isConnected ? 'connected'
+    dropped ? 'reconnect'
+    : isConnected ? 'connected'
     : isBusy ? 'connecting'
     : !supported ? 'disconnected'
     : 'demo';
 
   const label =
-    isConnected ? t('dotpad.status.connected')
+    dropped ? t('dotpad.status.reconnect')
+    : isConnected ? t('dotpad.status.connected')
     : status === 'searching' ? t('dotpad.status.searching')
     : status === 'connecting' ? t('dotpad.status.connecting')
     : !supported ? t('dotpad.status.offline')

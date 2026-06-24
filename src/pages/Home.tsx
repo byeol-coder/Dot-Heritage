@@ -129,6 +129,7 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [scanning, setScanning] = useState(false);
   const [hovering, setHovering] = useState(false);
+  const [imgErrors, setImgErrors] = useState<Set<number>>(new Set());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scanTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -295,13 +296,14 @@ export function Home({ onStart, onMuseum, onSchool }: Props) {
                 {/* Museum display area */}
                 <div className={styles.cardVisual} aria-hidden="true">
                   <div className={styles.spotlightRing} aria-hidden="true" />
-                  {current.image ? (
+                  {current.image && !imgErrors.has(activeIndex) ? (
                     <img
                       src={current.image}
                       alt=""
                       className={styles.cardImage}
                       loading="lazy"
                       decoding="async"
+                      onError={() => setImgErrors(prev => new Set(prev).add(activeIndex))}
                     />
                   ) : (
                     <span className={styles.cardEmoji} style={{ fontSize: '4rem', lineHeight: 1 }}>{current.emoji}</span>
