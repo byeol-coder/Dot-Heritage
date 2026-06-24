@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Home } from './pages/Home';
 import { Collection } from './pages/Collection';
 import { Guide } from './pages/Guide';
@@ -71,32 +71,35 @@ export default function App() {
   return (
     <>
       <div aria-live="polite" aria-atomic="true" className="sr-only">{screenLabel}</div>
-      <AnimatePresence mode="wait">
+      {/* Keyed enter-fade, NO AnimatePresence/exit. The Home screen contains
+          nested AnimatePresence carousels on a setInterval; if Home were the
+          exiting child of a screen-level AnimatePresence, those still-cycling
+          presences deadlock its exit and the next screen never mounts. Keying
+          a plain motion.div by `screen` unmounts the old screen immediately and
+          fades the new one in — reliable navigation, no stale/stacked pages. */}
+      <motion.div
+        key={screen}
+        initial={pageTransition.initial}
+        animate={pageTransition.animate}
+        transition={pageTransition.transition}
+      >
         {screen === 'home' && (
-          <motion.div key="home" {...pageTransition}>
-            <Home
-              onStart={() => startExperience('standard')}
-              onMuseum={() => startExperience('museum')}
-              onSchool={() => startExperience('school')}
-            />
-          </motion.div>
+          <Home
+            onStart={() => startExperience('standard')}
+            onMuseum={() => startExperience('museum')}
+            onSchool={() => startExperience('school')}
+          />
         )}
         {screen === 'collection' && (
-          <motion.div key="collection" {...pageTransition}>
-            <Collection onSelect={selectHeritage} onBack={goHome} />
-          </motion.div>
+          <Collection onSelect={selectHeritage} onBack={goHome} />
         )}
         {screen === 'guide' && (
-          <motion.div key="guide" {...pageTransition}>
-            <Guide heritageId={selectedId} mode={mode} onBack={goCollection} onExplore={goExplore} />
-          </motion.div>
+          <Guide heritageId={selectedId} mode={mode} onBack={goCollection} onExplore={goExplore} />
         )}
         {screen === 'explore' && (
-          <motion.div key="explore" {...pageTransition}>
-            <Explore initialSceneId={selectedId} onBack={() => setScreen('guide')} />
-          </motion.div>
+          <Explore initialSceneId={selectedId} onBack={() => setScreen('guide')} />
         )}
-      </AnimatePresence>
+      </motion.div>
     </>
   );
 }
