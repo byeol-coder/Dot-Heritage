@@ -9,6 +9,7 @@ import cardStyles from '../components/heritage/HeritageCard.module.css';
 interface Props {
   onSelect: (id: string) => void;
   onBack: () => void;
+  onStudio?: () => void;
 }
 
 const difficultyColors: Record<string, string> = { Easy: '#6FAF9F', Medium: '#C8A56A', Hard: '#E07070' };
@@ -24,7 +25,7 @@ const tagKeys: Record<string, string> = {
   'Intro Demo': 'collection.tag.introDemo',
 };
 
-export function Collection({ onSelect, onBack }: Props) {
+export function Collection({ onSelect, onBack, onStudio }: Props) {
   const { t, tl } = useI18n();
   return (
     <div className={styles.page}>
@@ -32,6 +33,11 @@ export function Collection({ onSelect, onBack }: Props) {
         <button onClick={onBack} className={styles.backBtn} aria-label={t('collection.backAria')}>← {t('common.back')}</button>
         <Logo size="sm" variant="full" />
         <LanguageToggle />
+        {onStudio && (
+          <button onClick={onStudio} className={styles.studioBtn}>
+            {t('studio.openBtn')}
+          </button>
+        )}
       </header>
       <main className={styles.main}>
         <motion.div className={styles.intro} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>

@@ -4,10 +4,11 @@ import { Home } from './pages/Home';
 import { Collection } from './pages/Collection';
 import { Guide } from './pages/Guide';
 import { Explore } from './pages/Explore';
+import { TactileStudio } from './pages/TactileStudio';
 import { useI18n } from './i18n/i18n';
 import type { AppMode } from './types/heritage';
 
-type Screen = 'home' | 'collection' | 'guide' | 'explore';
+type Screen = 'home' | 'collection' | 'guide' | 'explore' | 'studio';
 
 const VALID_MODES: AppMode[] = ['standard', 'museum', 'school'];
 
@@ -49,6 +50,8 @@ export default function App() {
     setScreen('explore');
   }, []);
 
+  const goStudio = useCallback(() => setScreen('studio'), []);
+
   // Sync screen state back to URL so refresh and deep-links always work.
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -64,10 +67,16 @@ export default function App() {
       url.searchParams.set('explore', selectedId);
       url.searchParams.delete('heritage');
       url.searchParams.delete('mode');
+    } else if (screen === 'studio') {
+      url.searchParams.delete('heritage');
+      url.searchParams.delete('explore');
+      url.searchParams.delete('mode');
+      url.searchParams.set('studio', '1');
     } else {
       url.searchParams.delete('heritage');
       url.searchParams.delete('explore');
       url.searchParams.delete('mode');
+      url.searchParams.delete('studio');
     }
     window.history.replaceState({}, '', url.toString());
   }, [screen, selectedId, mode]);
@@ -80,6 +89,7 @@ export default function App() {
         if (helpText) { setHelpText(null); return; }
         if (screen === 'guide') setScreen('collection');
         else if (screen === 'explore') setScreen('guide');
+        else if (screen === 'studio') setScreen('collection');
         else if (screen === 'collection') setScreen('home');
       }
       if (e.key === 'F1' && screen === 'guide') {
@@ -150,13 +160,16 @@ export default function App() {
           />
         )}
         {screen === 'collection' && (
-          <Collection onSelect={selectHeritage} onBack={goHome} />
+          <Collection onSelect={selectHeritage} onBack={goHome} onStudio={goStudio} />
         )}
         {screen === 'guide' && (
           <Guide heritageId={selectedId} mode={mode} onBack={goCollection} onExplore={goExplore} />
         )}
         {screen === 'explore' && (
           <Explore initialSceneId={selectedId} onBack={() => setScreen('guide')} />
+        )}
+        {screen === 'studio' && (
+          <TactileStudio onBack={() => setScreen('collection')} />
         )}
       </motion.div>
     </>
